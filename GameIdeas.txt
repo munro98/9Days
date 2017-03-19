@@ -1,0 +1,60 @@
+Classes
+
+
+Mercenary
+Focus Fire (Inf ammo faster fire rate)
+Rocket Launcher
+
+
+Samari (attack faster with sword)
+Blade Spin 
+Blade Run (attack faster + lunge forward)
+
+
+Mad Scientist
+Telsa Coil (zaps near enemies AOE)
+Laser Gun
+
+
+Engineer
+Build turret
+Roller mine
+
+
+Sniper (fire with sniper faster)
+Headshot (double damage)
+Aimbot (gives sniper)
+
+
+Medic
+Heal Station
+Revive Team
+
+
+Demolitions
+Pipe Bombs
+Rocket Launcher
+
+
+
+Pistol
+
+
+Assualt Rifle
+Sniper Rifle
+
+
+Laser gun
+Rocket launcher
+
+
+ability weapon replaces current weapon
+
+TODO
+Make Game state manager
+gun class
+animate legs
+randomize bullet directions
+pathfinding ai
+
+optimize rendering
