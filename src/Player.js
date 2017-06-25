@@ -49,25 +49,25 @@ class Player extends Actor {
 
     var deltaPos = inputVec3;
     deltaPos = deltaPos.normalized().mul(deltaTime * this.accel);
-    this.vel = this.vel.add(deltaPos);
+    this.newVel = this.newVel.add(deltaPos);
 
-    if (this.vel.mag() > this.maxVel) {
-      this.vel = this.vel.normalized().mul(this.maxVel);
+    if (this.newVel.mag() > this.maxVel) {
+      this.newVel = this.newVel.normalized().mul(this.maxVel);
     }
 
     var deceleration = this.decel * deltaTime;
     //console.log(this.decel);
     if (inputVec3.mag() == 0) {
       //var decelerationVec3 = new Vec3(0, 0, 0); TODO Make deceleration normalized
-      if (this.vel.x > 0) {
-        this.vel.x = Math.max(this.vel.x - deceleration, 0);
+      if (this.newVel.x > 0) {
+        this.newVel.x = Math.max(this.newVel.x - deceleration, 0);
       } else {
-        this.vel.x = Math.min(this.vel.x + deceleration, 0);
+        this.newVel.x = Math.min(this.newVel.x + deceleration, 0);
       }
-      if (this.vel.y > 0) {
-        this.vel.y = Math.max(this.vel.y - deceleration, 0);
+      if (this.newVel.y > 0) {
+        this.newVel.y = Math.max(this.newVel.y - deceleration, 0);
       } else {
-        this.vel.y = Math.min(this.vel.y + deceleration, 0);
+        this.newVel.y = Math.min(this.newVel.y + deceleration, 0);
       }
     }
 

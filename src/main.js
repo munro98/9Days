@@ -89,7 +89,7 @@ window.onload = async function() {
     ctx.drawImage(levelImage,0,0);
     level = new Level(levelImage.width);
 
-    setInterval(tick, 32);
+    setInterval(tick, 16);
   };
   levelImage.src = "res/level.png";
 
@@ -99,9 +99,7 @@ window.onload = async function() {
 
   c.addEventListener("mouseup", onMouseUp, false);
   c.addEventListener("mousedown", onMouseDown, false);
-
   c.addEventListener("mousemove", onMouseMove, false);
-
   c.addEventListener("wheel", onMouseWheel, false);
   
   cameraPosition = player.pos.mul(-1).add(new Vec2 (ctx.canvas.width / 2, ctx.canvas.height / 2));
@@ -186,12 +184,19 @@ function tick() {
       }
   }
 
+
+
+
+
+
+
   //ctx.strokeStyle="#f0f0f0";
   //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   
   //ctx.strokeStyle="#000000";
   
+  //rendering
 
   level.draw(cameraPosition);
 

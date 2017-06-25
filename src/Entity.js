@@ -2,6 +2,7 @@ class Entity {
   constructor () {
     this.pos = new Vec2(0, 0, 0);
     this.vel = new Vec2(0, 0, 0);
+    this.newVel = new Vec2(0, 0, 0);
 
     this.width = 32;
     this.height = 32;
@@ -10,8 +11,9 @@ class Entity {
   }
 
   update (){
-    this.pos.x += this.vel.x * deltaTime;
-    this.pos.y += this.vel.y * deltaTime;
+    this.pos.x += (this.vel.x + this.newVel.x) / 2 * deltaTime;
+    this.pos.y += (this.vel.y + this.newVel.y) / 2 * deltaTime;
+    this.vel = this.newVel;
     this.lifeTime += deltaTime;
   }
 
