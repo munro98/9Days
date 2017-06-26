@@ -40,6 +40,8 @@ class Zombie extends Actor {
 
     ctx.save();
     ctx.translate(vec3.x,vec3.y);
+    ctx.strokeStyle = "rgb(255,0,0)";
+    ctx.strokeRect(0, 0,this.width,this.height);
     ctx.rotate(this.rotation * Math.PI/180);
     ctx.drawImage(this.texture.image,-32,-32);
     ctx.restore();

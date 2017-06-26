@@ -32,7 +32,7 @@ class Player extends Actor {
 
     this.lifeTime += deltaTime;
 
-    var inputVec3 = new Vec2(0,0,0);
+    var inputVec3 = new Vec2(0,0);
     if (keyCodeSet.has(87)) {
       inputVec3.y = -4;
     }
@@ -130,6 +130,8 @@ class Player extends Actor {
 
     ctx.save();
     ctx.translate(vec3.x,vec3.y);
+    ctx.strokeStyle = "rgb(255,0,0)";
+    ctx.strokeRect(0, 0,this.width,this.height);
     ctx.rotate(this.rotation * Math.PI/180);
     ctx.drawImage(this.texture.image,-32,-32);
     ctx.restore();

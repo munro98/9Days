@@ -19,6 +19,8 @@ var zombie = new Zombie(new Vec2(100, 100));
 
 var zombieList = new Array();
 zombieList.push(zombie);
+zombieList.push(new Zombie(new Vec2(200, 200)));
+zombieList.push(new Zombie(new Vec2(400, 400)));
 
 var entityList = new Array();
 
@@ -184,7 +186,44 @@ function tick() {
       }
   }
 
+  var playersAndZombies = zombieList.concat(player);
 
+  //Build Quadtree
+  var quadTree = new QuadTree(0, 0, 1200, 0);
+  quadTree.addEntity(player);
+  for (var j = 0; j < zombieList.length; j++) {
+    quadTree.addEntity(zombieList[j]);
+  }
+  
+  //console.log("els" + quadTree.countElements());
+  ///*
+  for (var j = 0; j < playersAndZombies.length; j++) {
+    var potentialCollisions = quadTree.selectBoxes(playersAndZombies[j]);
+    for (var i = 0; i < potentialCollisions.length; i++) {
+      if (playersAndZombies[j] == potentialCollisions[i])
+        continue;
+      if (playersAndZombies[j].isIntersecting(potentialCollisions[i])) {
+        playersAndZombies[j].resolveCollision(potentialCollisions[i]);
+        //console.log("ow");
+      }
+    }
+    //if (player.isIntersecting(zombieList[j])) {
+      //console.log("ow");
+    //}
+  }
+  //*/
+
+  /*
+  var potentialCollisions = quadTree.selectBoxes(player);
+  for (var i = 0; i < potentialCollisions.length; i++) {
+    //console.log("ow" + potentialCollisions[i].pos);
+    if (player == potentialCollisions[i])
+      continue;
+    if (player.isIntersecting(potentialCollisions[i])) {
+      console.log("ow");
+    }
+  }
+  */
 
 
 
@@ -212,6 +251,9 @@ function tick() {
     entityList[i].draw(cameraPosition);
   }
 
+  player.draw(cameraPosition);
+  quadTree.drawQuads(cameraPosition);
+
   //Draw HUD
 
   ctx.font = "30px Verdana";
@@ -228,7 +270,7 @@ function tick() {
   //ctx.rotate(20*Math.PI/180);
   //console.log(runTime);
 
-  player.draw(cameraPosition);
+  
   
   //ctx.translate(500, 500);
   //ctx.rotate((runTime * 100)*Math.PI/180);
