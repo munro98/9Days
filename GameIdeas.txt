@@ -12,23 +12,23 @@ Blade Run (attack faster + lunge forward)
 
 
 Mad Scientist
-Telsa Coil (zaps near enemies AOE)
+Telsa Gun
 Laser Gun
 
 
 Engineer
 Build turret
-Roller mine
+Roller bomb splits and seeks targets
 
 
 Sniper (fire with sniper faster)
-Headshot (double damage)
+Headshot (1 in 4 chance of crit)
 Aimbot (gives sniper)
 
 
 Medic
 Heal Station
-Revive Team
+Revive Entire Team
 
 
 Demolitions
@@ -37,24 +37,34 @@ Rocket Launcher
 
 
 
-Pistol
-
-
-Assualt Rifle
-Sniper Rifle
+Pistol pea shooter
+Pistol Deag(1 in 4 chance of crit)
+Assault Rifle akbar
+Sniper Rifle aniahlator
+Auto shotgun
+Shotgun boom stick(high knockback)
 
 
 Laser gun
 Rocket launcher
+Ricochet gun
+Flamethrower
+
+
+zombies
+
+Pusher zombie
+super fast low hp low damage
 
 
 ability weapon replaces current weapon
 
 TODO
 Make Game state manager
-gun class
+particles explosions
+
 animate legs
-randomize bullet directions
 pathfinding ai
+zombie spawn system
 
 optimize rendering

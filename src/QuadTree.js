@@ -215,8 +215,8 @@ class QuadTree {
 
     var result = new Array();
     
-    if(entity.x + entity.width < this.x || entity.x > this.x + this.w) return result;
-    if(entity.y + entity.height < this.y || entity.y > this.y + this.w) return result;
+    if(entity.pos.x + entity.width < this.x || entity.pos.x > this.x + this.w) return result;
+    if(entity.pos.y + entity.height < this.y || entity.pos.y > this.y + this.w) return result;
 
     if (this.points.length > 0) {
       result = result.concat(this.points);
@@ -239,24 +239,32 @@ class QuadTree {
     return result;
   }
 
-  printLeaves (){
-    for (var i = 0; i < this.points.length; i++) {
-        var p = this.points[i];
-        console.log("x: " + p.x + " y: " + p.y);
+  selectPoints (entity){
+    //console.log(entity.pos.x);
+
+    var result = new Array();
+    
+    if(entity.x < this.x || entity.x > this.x + this.w) return result;
+    if(entity.y < this.y || entity.y > this.y + this.w) return result;
+
+    if (this.points.length > 0) {
+      result = result.concat(this.points);
     }
 
     if (this.q0 != null) {
-      this.q0.printLeaves();
+      result = result.concat(this.q0.selectPoints(entity));
     }
     if (this.q1 != null) {
-      this.q1.printLeaves();
+      result = result.concat(this.q1.selectPoints(entity));
     }
     if (this.q2 != null) {
-      this.q2.printLeaves();
+      result = result.concat(this.q2.selectPoints(entity));
     }
     if (this.q3 != null) {
-      this.q3.printLeaves();
+      result = result.concat(this.q3.selectPoints(entity));
     }
+
+    return result;
   }
 
   countElements (){

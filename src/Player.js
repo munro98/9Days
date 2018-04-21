@@ -2,8 +2,8 @@ class Player extends Actor {
     constructor (pos) {
     super(64, pos)
     
-    this.accel = 800;
-    this.decel = 400;
+    this.accel = 1600;
+    this.decel = 800;
     this.maxVel = 240;
     this.rotation = 0;
 
@@ -11,13 +11,18 @@ class Player extends Actor {
 
     this.texture = new Texture("res/player.png");
 
-    this.altWeapon = null;
-    this.activeWeapon = new Pistol(new Vec2(0,0));
+    this.altWeapon = new PulseWave(new Vec2(0,0));
+    this.activeWeapon = new Sniper(new Vec2(0,0));
+
+    
   }
 
   update (){
 
-    var vec3 = cameraPosition.add(this.pos); // position of player screen space
+
+    var playerCentre = this.pos.add(new Vec2(this.width*0.5, this.width*0.5));
+
+    var vec3 = cameraPosition.add(playerCentre); // position of player screen space
     var relvec3 = new Vec2(mouseX, mouseY).sub(vec3);
     
     //this.rotation
@@ -34,17 +39,17 @@ class Player extends Actor {
 
     var inputVec3 = new Vec2(0,0);
     if (keyCodeSet.has(87)) {
-      inputVec3.y = -4;
+      inputVec3.y += -1;
     }
     if (keyCodeSet.has(83)) {
-      inputVec3.y = 4;
+      inputVec3.y += 1;
     }
 
     if (keyCodeSet.has(65)) {
-      inputVec3.x = -4;
+      inputVec3.x += -1;
     }
     if (keyCodeSet.has(68)) {
-      inputVec3.x += 4;
+      inputVec3.x += 1;
     }
 
     var deltaPos = inputVec3;
@@ -71,9 +76,10 @@ class Player extends Actor {
       }
     }
 
-    if (keyCodeSet.has(69) & 1) {
+    if (downKeysFrame.has(69)) {
+      console.log("sdg")
       for (var i = 0; i < guns.length; i++) {
-        if (guns[i].hit(this.pos)) { //.add(new Vec2(this.width / 2, this.height / 2))
+        if (guns[i].hit(this.posCenter)) { //.add(new Vec2(this.width / 2, this.height / 2))
           if (this.altWeapon == null) {
             this.altWeapon = this.activeWeapon;
             this.activeWeapon = guns[i];
@@ -94,20 +100,33 @@ class Player extends Actor {
       this.activeWeapon = new Pistol(new Vec2(0,0));
     }
 
-    var bulletVec3 = new Vec2(mouseX, mouseY).sub(cameraPosition.add(this.pos));
-    // this.timeSinceLastFire > activeWeapon.fireRate && mouseDown
+    var bulletVec2 = new Vec2(mouseX, mouseY).sub(cameraPosition.add(playerCentre));
+    var bulletAngle = -Math.atan2(bulletVec2.y, bulletVec2.x); // In radians
+
+    var spread = this.activeWeapon.spread;
+    bulletAngle += 90 * (Math.PI / 180); // offset 90 degrees 
+
+    //console.log(bulletAngle + ": " + bulletVec3.x + " " + bulletVec3.y + " ")
+    //console.log();
+
     if (this.timeSinceLastFire > this.activeWeapon.timeBetweenShots && mouseDown && this.activeWeapon.ammo > 0) {
+
+
       this.timeSinceLastFire = 0;
+      //playSound();
       for (var i = 0; i < this.activeWeapon.bulletsEachShot; i++) {
-        var bullet = new Bullet(new Vec2(this.pos.x, this.pos.y), this.rotation);
-        bullet.vel = new Vec2(bulletVec3.x, bulletVec3.y, 0).normalized().mul(1000);
-        entityList.push(bullet);
-        this.activeWeapon.ammo = this.activeWeapon.ammo - 1;
+
+        var offsetAngle = bulletAngle + (Math.random() * spread - (spread * 0.5) ) * (Math.PI / 180);
+        bulletVec2 = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
+
+
+        var bullet = new Bullet(playerCentre, this.activeWeapon.damage); // , -offsetAngle * 180 / Math.PI
+        bullet.vel = bulletVec2.normalized().mul(this.activeWeapon.bulletSpeed);
+        bulletList.push(bullet);
+        
       }
+      this.activeWeapon.ammo = this.activeWeapon.ammo - 1;
     }
-    //console.log(this.pos.x);
-    //this.pos.x += this.vel.x * deltaTime;
-    //this.pos.y += this.vel.y * deltaTime;
 
     //if (onKeyDownCodeSet.has(69)) {
     
@@ -122,19 +141,5 @@ class Player extends Actor {
     var temp = this.activeWeapon;
     this.activeWeapon = this.altWeapon;
     this.altWeapon = temp;
-  }
-
-  draw (view){
-    //console.log("draw " + this.pos.x);
-    var vec3 = view.add(this.pos);
-
-    ctx.save();
-    ctx.translate(vec3.x,vec3.y);
-    ctx.strokeStyle = "rgb(255,0,0)";
-    ctx.strokeRect(0, 0,this.width,this.height);
-    ctx.rotate(this.rotation * Math.PI/180);
-    ctx.drawImage(this.texture.image,-32,-32);
-    ctx.restore();
-
   }
 }
