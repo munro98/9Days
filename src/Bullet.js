@@ -15,16 +15,15 @@ class Bullet {
 
   update (){
     /*
-    
-    */
-    if (level.hit(this.pos.add(new Vec2(this.vel.x * deltaTime, 0))) || level.hit(this.pos.add(new Vec2(this.vel.x * (deltaTime * 0.5), 0))) ) {
-      this.vel.x = -this.vel.x;
-    } else if (level.hit(this.pos.add(new Vec2(0, this.vel.y * deltaTime))) ||  level.hit(this.pos.add(new Vec2(0, this.vel.y * (deltaTime * 0.5)))) ) {
-      this.vel.y = -this.vel.y;
-    }
+		if (level.hit(this.pos.add(new Vec2(this.vel.x * deltaTime, 0))) || level.hit(this.pos.add(new Vec2(this.vel.x * (deltaTime * 0.5), 0))) ) {
+			this.vel.x = -this.vel.x;
+		} else if (level.hit(this.pos.add(new Vec2(0, this.vel.y * deltaTime))) ||  level.hit(this.pos.add(new Vec2(0, this.vel.y * (deltaTime * 0.5)))) ) {
+			this.vel.y = -this.vel.y;
+		}
+		*/
 
     if (this.testHitLevel()) {
-      //this.remove = true;
+      this.remove = true;
     }
 
     this.pos.x += this.vel.x * deltaTime;

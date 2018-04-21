@@ -1,7 +1,6 @@
 class Entity {
   constructor (size, pos) {
     this.pos = pos;
-    this.posCenter = pos.add(new Vec2(size/2, size/2));
     this.vel = new Vec2(0, 0);
     this.newVel = new Vec2(0, 0);
 
@@ -17,58 +16,47 @@ class Entity {
 
   update (){
 
-    var nextXposition = this.pos.x + (this.vel.x + this.newVel.x) / 2 * deltaTime;
+    ///*
+		var nextXposition = this.pos.x + this.vel.x * deltaTime;
+		var hitX = false;
 
-    //var hitX = level.hit(new Vec2(nextXposition, this.pos.y)) || level.hit(new Vec2(nextXposition + 32, this.pos.y)) || level.hit(new Vec2(nextXposition + 64, this.pos.y)) ||
-    //level.hit(new Vec2(nextXposition, this.pos.y)) || level.hit(new Vec2(nextXposition, this.pos.y + 32)) || level.hit(new Vec2(nextXposition, this.pos.y + 64));
-    var hitX = false;
+		for (let x = 0; x <= this.width; x += 32) {
+			for (let y = 0; y <= this.width; y += 32) {
+				hitX |= level.hit(new Vec2(nextXposition + x, this.pos.y + y));
+			}
+		}
 
-    for (var x = 0; x <= this.width; x += 32) {
-      for (var y = 0; y <= this.width; y += 32) {
-        hitX |= level.hit(new Vec2(nextXposition + x, this.pos.y + y));
-      }
-    }
-    //hitX |= level.hit(new Vec2(nextXposition + this.width, this.pos.y + this.height));
+		if (!hitX) {
+			this.pos.x += this.vel.x * deltaTime;
+		} else {
+			this.vel.x = 0;
+		}
 
-    if (!hitX) {
-      this.pos.x += (this.vel.x + this.newVel.x) / 2 * deltaTime;
-    } else {
-      this.vel.x = 0;
-      this.newVel.x = 0;
-    }
+		var nextYposition = this.pos.y + this.vel.y * deltaTime;
+		var hitY = false;
 
+		for (let x = 0; x <= this.width; x += 32) {
+			for (let y = 0; y <= this.width; y += 32) {
+				hitY |= level.hit(new Vec2(this.pos.x + x, nextYposition + y));
+			}
+		}
+		if (!hitY) {
+			this.pos.y += this.vel.y * deltaTime;
+		} else {
+			this.vel.y = 0;
+		}
+		//*/
 
-    var nextYposition = this.pos.y + (this.vel.y + this.newVel.y) / 2 * deltaTime;
+		this.lifeTime += deltaTime;
 
-    //var hitY = level.hit(new Vec2(this.pos.x, nextYposition)) || level.hit(new Vec2(this.pos.x, nextYposition + 32)) || level.hit(new Vec2(this.pos.x, nextYposition + 64)) ||
-    //level.hit(new Vec2(this.pos.x, nextYposition)) || level.hit(new Vec2(this.pos.x + 32, nextYposition)) || level.hit(new Vec2(this.pos.x + 64, nextYposition));
-    var hitY = false;
-
-    for (var x = 0; x <= this.width; x += 32) {
-      for (var y = 0; y <= this.width; y += 32) {
-        hitY |= level.hit(new Vec2(this.pos.x + x, nextYposition + y));
-      }
-    }
-    //hitY |= level.hit(new Vec2(this.pos.x + this.width, nextYposition + this.height));
-    if (!hitY) {
-      this.pos.y += (this.vel.y + this.newVel.y) / 2 * deltaTime;
-    } else {
-      this.vel.y = 0;
-      this.newVel.y = 0;
-    }
-
-    //this.pos.x += (this.vel.x + this.newVel.x) / 2 * deltaTime;
-    //this.pos.y += (this.vel.y + this.newVel.y) / 2 * deltaTime;
-    this.posCenter = this.pos.add(new Vec2(this.width/2, this.height/2));
-
-
-    this.vel = this.newVel;
-    this.lifeTime += deltaTime;
-
-    if (this.health < 0) {
-      this.remove = true;
-    }
+		if (this.health < 0) {
+			this.remove = true;
+		}
   }
+
+  getCenter() {
+		return this.pos.add(new Vec2(this.width * 0.5, this.height * 0.5));
+	}
 
   isOnScreen (view){
     var vec2 = view.add(this.pos);

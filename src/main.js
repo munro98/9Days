@@ -27,8 +27,8 @@ for (var j = 0; j < 25; j++) {
   //zombieList.push(new Zombie(new Vec2(100, 1800+j*50)));
 }
 
-for (var i = 0; i < 28; i++) {
-  for (var j = 0; j < 10; j++) {//25
+for (var i = 0; i < 3; i++) {
+  for (var j = 0; j < 3; j++) {//25
     zombieList.push(new Zombie(new Vec2(100+i*50, 1800+j*50)));
   }
 }
@@ -87,6 +87,13 @@ Refactor
 
 fix onkeydown
 and concurrency in swapWeapons
+
+zombies looking direction
+create spawn system
+zombies do damage to player
+
+
+
 */
 var c;
 var ctx;
@@ -261,7 +268,7 @@ function tick() {
   mouseWorldGrid.x = Math.max(0, Math.min(level.width, mouseWorldGrid.x));
   mouseWorldGrid.y = Math.max(0, Math.min(level.width, mouseWorldGrid.y));
 
-  var zombieGrid = new Vec2(Math.floor(zombie.posCenter.x / 32), Math.floor(zombie.posCenter.y / 32));
+  var zombieGrid = new Vec2(Math.floor(zombie.getCenter().x / 32), Math.floor(zombie.getCenter().y / 32));
   zombieGrid.x = Math.max(0, Math.min(level.width, zombieGrid.x));
   zombieGrid.y = Math.max(0, Math.min(level.width, zombieGrid.y));
 
@@ -426,11 +433,9 @@ function tick() {
   //player.draw(cameraPosition);
   quadTree.drawQuads(cameraPosition);
 
-
-  //ctx.fillStyle = "#00FF00";
-  for (var n of zombieList[0].path) {
-    ctx.fillRect(cameraPosition.x + n.x*level.tileSize, cameraPosition.y+n.y*level.tileSize,level.tileSize,level.tileSize);
-  }
+  //for (var n of zombieList[0].path) {
+  //  ctx.fillRect(cameraPosition.x + n.x*level.tileSize, cameraPosition.y+n.y*level.tileSize,level.tileSize,level.tileSize);
+  //}
 
   //Draw HUD
 

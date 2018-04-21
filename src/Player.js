@@ -11,29 +11,26 @@ class Player extends Actor {
 
     this.texture = new Texture("res/player.png");
 
-    this.altWeapon = new PulseWave(new Vec2(0,0));
-    this.activeWeapon = new Sniper(new Vec2(0,0));
+    //this.altWeapon = new PulseWave(new Vec2(0,0));
+    //this.activeWeapon = new Sniper(new Vec2(0,0));
+
+    this.altWeapon = new Rifle(new Vec2(0, 0));
+		this.activeWeapon = new Pistol(new Vec2(0, 0));
 
     
   }
 
   update (){
 
+    var vec3 = cameraPosition.add(this.getCenter()); // position of player screen space
+		var relvec3 = new Vec2(mouseX, mouseY).sub(vec3);
 
-    var playerCentre = this.pos.add(new Vec2(this.width*0.5, this.width*0.5));
+		this.rotation = Math.atan(relvec3.y / relvec3.x) * 180 / Math.PI;
+		if (relvec3.x >= 0.0) {
+			this.rotation += 180;
+		}
 
-    var vec3 = cameraPosition.add(playerCentre); // position of player screen space
-    var relvec3 = new Vec2(mouseX, mouseY).sub(vec3);
-    
-    //this.rotation
-    this.rotation = Math.atan(relvec3.y / relvec3.x) * 180 / Math.PI;
-    if (relvec3.x >= 0.0) {
-      this.rotation += 180;
-    }
-
-    this.rotation += 90;
-    //(Math.random() - 0.5) * 2;
-    //console.log(this.rotation);
+		this.rotation += 90;
 
     this.lifeTime += deltaTime;
 
@@ -54,32 +51,32 @@ class Player extends Actor {
 
     var deltaPos = inputVec3;
     deltaPos = deltaPos.normalized().mul(deltaTime * this.accel);
-    this.newVel = this.newVel.add(deltaPos);
+    this.vel = this.vel.add(deltaPos);
 
-    if (this.newVel.mag() > this.maxVel) {
-      this.newVel = this.newVel.normalized().mul(this.maxVel);
+    if (this.vel.mag() > this.maxVel) {
+      this.vel = this.vel.normalized().mul(this.maxVel);
     }
 
     var deceleration = this.decel * deltaTime;
     //console.log(this.decel);
     if (inputVec3.mag() == 0) {
       //var decelerationVec3 = new Vec3(0, 0, 0); TODO Make deceleration normalized
-      if (this.newVel.x > 0) {
-        this.newVel.x = Math.max(this.newVel.x - deceleration, 0);
+      if (this.vel.x > 0) {
+        this.vel.x = Math.max(this.vel.x - deceleration, 0);
       } else {
-        this.newVel.x = Math.min(this.newVel.x + deceleration, 0);
+        this.vel.x = Math.min(this.vel.x + deceleration, 0);
       }
-      if (this.newVel.y > 0) {
-        this.newVel.y = Math.max(this.newVel.y - deceleration, 0);
+      if (this.vel.y > 0) {
+        this.vel.y = Math.max(this.vel.y - deceleration, 0);
       } else {
-        this.newVel.y = Math.min(this.newVel.y + deceleration, 0);
+        this.vel.y = Math.min(this.vel.y + deceleration, 0);
       }
     }
 
     if (downKeysFrame.has(69)) {
       console.log("sdg")
       for (var i = 0; i < guns.length; i++) {
-        if (guns[i].hit(this.posCenter)) { //.add(new Vec2(this.width / 2, this.height / 2))
+        if (guns[i].hit(this.getCenter())) { //.add(new Vec2(this.width / 2, this.height / 2))
           if (this.altWeapon == null) {
             this.altWeapon = this.activeWeapon;
             this.activeWeapon = guns[i];
@@ -100,7 +97,7 @@ class Player extends Actor {
       this.activeWeapon = new Pistol(new Vec2(0,0));
     }
 
-    var bulletVec2 = new Vec2(mouseX, mouseY).sub(cameraPosition.add(playerCentre));
+    var bulletVec2 = new Vec2(mouseX, mouseY).sub(cameraPosition.add(this.getCenter()));
     var bulletAngle = -Math.atan2(bulletVec2.y, bulletVec2.x); // In radians
 
     var spread = this.activeWeapon.spread;
@@ -120,7 +117,7 @@ class Player extends Actor {
         bulletVec2 = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
 
 
-        var bullet = new Bullet(playerCentre, this.activeWeapon.damage); // , -offsetAngle * 180 / Math.PI
+        var bullet = new Bullet(this.getCenter(), this.activeWeapon.damage); // , -offsetAngle * 180 / Math.PI
         bullet.vel = bulletVec2.normalized().mul(this.activeWeapon.bulletSpeed);
         bulletList.push(bullet);
         
