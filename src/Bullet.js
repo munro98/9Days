@@ -20,10 +20,38 @@ class Bullet {
 		} else if (level.hit(this.pos.add(new Vec2(0, this.vel.y * deltaTime))) ||  level.hit(this.pos.add(new Vec2(0, this.vel.y * (deltaTime * 0.5)))) ) {
 			this.vel.y = -this.vel.y;
 		}
-		*/
+    */
+    
+    this.rotation = Math.atan(this.vel.y / this.vel.x) * 180 / Math.PI;
+    if (this.vel.x >= 0.0) {
+      this.rotation += 180;
+    }
 
     if (this.testHitLevel()) {
       this.remove = true;
+
+      let spread = 90;
+
+
+      for (let i = 0; i < 5; i++) {
+
+        //let offsetAngle = this.rotation * Math.PI / 180;//
+        let offsetAngle = this.rotation;
+        let particleVec = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
+
+        let dir = this.vel.mul(-1);
+        let ang = -Math.atan2(dir.y, dir.x); // In radians
+        ang += 90 * (Math.PI / 180);
+
+        ang += (Math.random() * spread - (spread * 0.5) ) * (Math.PI / 180);
+
+
+        dir = new Vec2(Math.sin(ang), Math.cos(ang));
+        //console.log(dir.x);
+
+        particleManager.createParticle(this.pos, dir.mul(500+Math.random()*500), {x: 255, y: 0, z: 0}, 20+Math.random()*10);
+
+      }
     }
 
     this.pos.x += this.vel.x * deltaTime;
@@ -56,10 +84,7 @@ class Bullet {
     if (vec3.x > cameraBound.x || vec3.y > cameraBound.y)
       return;
 
-    this.rotation = Math.atan(this.vel.y / this.vel.x) * 180 / Math.PI;
-    if (this.vel.x >= 0.0) {
-      this.rotation += 180;
-    }
+    
 
 
     ctx.save();

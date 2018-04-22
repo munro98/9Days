@@ -15,6 +15,9 @@ var mouseDown = false;
 var level;
 var tileImage;
 
+let particleManager = new ParticleManager();
+let cameraShake = new CameraShake();
+
 var player = new Player(new Vec2(700, 1500)); // 400, 40
 var zombie = new Zombie(new Vec2(600, 100));
 
@@ -29,7 +32,7 @@ for (var j = 0; j < 25; j++) {
 
 for (var i = 0; i < 3; i++) {
   for (var j = 0; j < 3; j++) {//25
-    zombieList.push(new Zombie(new Vec2(100+i*50, 1800+j*50)));
+    //zombieList.push(new Zombie(new Vec2(100+i*50, 1800+j*50)));
   }
 }
 
@@ -255,7 +258,16 @@ function tick() {
   gameManager.update(deltaTime);
   //gameManager.log();
 
+  cameraShake.update(deltaTime);
+  //cameraShake.more();
+  cameraShake.preDraw();
+
   cameraPosition = player.pos.mul(-1).add(new Vec2 (ctx.canvas.width / 2, ctx.canvas.height / 2));
+
+  cameraPosition = cameraPosition.add(cameraShake.offset);
+  //cameraPosition.x += cameraShake.offset.x;//(new Vec2 (400, 0));
+
+
 
   //console.log(cameraPosition.x);
   
@@ -308,6 +320,8 @@ function tick() {
     bulletList[i].update();
   }
   //*/
+
+  particleManager.update(level, deltaTime);
 
 
   var playersAndZombies = zombieList.concat(player);
@@ -429,6 +443,8 @@ function tick() {
   for (var i = 0; i < bulletList.length; i++) {
     bulletList[i].draw(cameraPosition, cameraBox);
   }
+
+  particleManager.render(cameraPosition);
 
   //player.draw(cameraPosition);
   quadTree.drawQuads(cameraPosition);

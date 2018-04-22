@@ -65,9 +65,11 @@ class Vec2 {
 		if (mag == 0) {
 			this.x = 0.0;
 			this.y = 0.0;
-		}
-		this.x /= mag;
-		this.y /= mag;
+		} else {
+      this.x /= mag;
+		  this.y /= mag;
+    }
+		
 	}
 }
 
