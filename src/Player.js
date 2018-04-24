@@ -17,10 +17,28 @@ class Player extends Actor {
     this.altWeapon = new Rifle(new Vec2(0, 0));
 		this.activeWeapon = new Pistol(new Vec2(0, 0));
 
+    this.lastPos = this.pos.copy();
+
+    this.distanceMoved = 0;
+
+    this.swayAngle = 0;
     
   }
 
   update (){
+
+    let dPos = this.pos.sub(this.lastPos);
+
+    this.distanceMoved += dPos.mag();
+
+    
+    this.lastPos = this.pos.copy();
+
+    let freq = 0.1;
+    let amp = 0.1;
+    this.swayAngle = Math.sin(this.distanceMoved * freq) * 180 / Math.PI * amp;
+
+    //console.log(this.swayAngle);
 
     var vec3 = cameraPosition.add(this.getCenter()); // position of player screen space
 		var relvec3 = new Vec2(mouseX, mouseY).sub(vec3);
@@ -30,7 +48,9 @@ class Player extends Actor {
 			this.rotation += 180;
 		}
 
-		this.rotation += 90;
+    this.rotation += 90;
+    
+    this.rotation += this.swayAngle;
 
     this.lifeTime += deltaTime;
 
@@ -49,10 +69,37 @@ class Player extends Actor {
       inputVec3.x += 1;
     }
 
-    var deltaPos = inputVec3;
+    let lookDotInput = inputVec3.normalized().dot(relvec3.normalized());
+    //console.log();
+
+    // Move slower when going backwards
+    let inputFactor = Math.min(Math.max(0,lookDotInput+1.5), 1);
+    console.log(inputFactor);
+    var deltaPos = inputVec3;//.mul(inputFactor);
+
+    
+
     deltaPos = deltaPos.normalized().mul(deltaTime * this.accel);
+
+    // apply velocity from controls
     this.vel = this.vel.add(deltaPos);
 
+    // Do friction
+    let newMag = this.vel.mag() - this.decel * deltaTime;
+
+    if (this.vel.mag() < 10) {
+      this.vel = new Vec2(0, 0);
+    }
+
+    this.vel = this.vel.normalized();
+    this.vel = this.vel.mul(newMag);
+
+    // Speed limit
+    if (this.vel.mag() > this.maxVel * inputFactor) {
+      this.vel = this.vel.normalized().mul(this.maxVel * inputFactor);
+    }
+
+    /*
     if (this.vel.mag() > this.maxVel) {
       this.vel = this.vel.normalized().mul(this.maxVel);
     }
@@ -72,6 +119,8 @@ class Player extends Actor {
         this.vel.y = Math.min(this.vel.y + deceleration, 0);
       }
     }
+    */
+
 
     if (downKeysFrame.has(69)) {
       console.log("sdg")

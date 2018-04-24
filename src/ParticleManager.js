@@ -1,7 +1,7 @@
 class ParticleManager
 {
     constructor() {
-        this.particleCount = 1024;
+        this.particleCount = 256;
 
         this.positions = new Float32Array(this.particleCount * 2);
         this.velocities = new Float32Array(this.particleCount * 2);
@@ -12,7 +12,7 @@ class ParticleManager
         this.currentParticle = 0;
 
         //this.texture = "res/player.png";
-        this.texture = new Texture("res/bullet.png");
+        this.texture = new Texture("res/debris.png");
     }
 
     createParticle(pos, vel, color, lifeTime) {
@@ -85,7 +85,7 @@ class ParticleManager
             //ctx.save();
             //ctx.translate(vec.x,vec.y);
             //ctx.drawImage(texture.getTexture(this.texture), -32/2, -32/2);
-            ctx.drawImage(this.texture.image, 0, 0, 64, 64, vec.x ,vec.y, 64, 64);
+            ctx.drawImage(this.texture.image, 0, 0, 32, 32, vec.x ,vec.y, 32, 32);
             //ctx.drawImage(this.texture.image, -32/2, -32/2);
             //ctx.restore();
 

@@ -1,3 +1,4 @@
+
 class GameManager {
   constructor (){
 
@@ -7,6 +8,8 @@ class GameManager {
       INTERMISSION: 2,
       END: 3
     };
+
+    this.statesText = ["Warm Up", "Playing", "Intermission", "End"];
 
     this.warmupLength = 5;
     this.roundLength = 10;
@@ -25,7 +28,12 @@ class GameManager {
     this.logCounter = 0;
     this.timeBetweenLogs = 1;
 
+    this.zombieSpawns = [new Vec2(2, 42), new Vec2(1, 62), new Vec2(1, 98), new Vec2(44, 98), new Vec2(82, 80), new Vec2(96, 70), new Vec2(44, 7)];
 
+
+    this.zombieSpawnTime = 1.0;
+
+    this.zombieSpawnTimer = 0.0;
 
   }
 
@@ -43,6 +51,18 @@ class GameManager {
         this.round++;
       }
     } else if (this.state == this.states.PLAYING) {
+
+      this.zombieSpawnTimer -= deltaTime;
+
+      if (this.zombieSpawnTimer < 0 ) {
+        this.zombieSpawnTimer = this.zombieSpawnTime;
+        //zombieList.push(new Zombie(new Vec2(100+i*50, 1800+j*50)));
+
+        let randInt = Math.floor(Math.random()*this.zombieSpawns.length);
+        let spawnPos = this.zombieSpawns[randInt].mul(32);
+        zombieList.push(new Zombie(spawnPos));
+
+      }
 
       if (this.time > this.roundLength) {
 

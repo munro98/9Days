@@ -92,7 +92,7 @@ fix onkeydown
 and concurrency in swapWeapons
 
 zombies looking direction
-create spawn system
+improve spawn system
 zombies do damage to player
 
 
@@ -264,7 +264,7 @@ function tick() {
 
   cameraPosition = player.pos.mul(-1).add(new Vec2 (ctx.canvas.width / 2, ctx.canvas.height / 2));
 
-  cameraPosition = cameraPosition.add(cameraShake.offset);
+  //cameraPosition = cameraPosition.add(cameraShake.offset);
   //cameraPosition.x += cameraShake.offset.x;//(new Vec2 (400, 0));
 
 
@@ -458,7 +458,7 @@ function tick() {
   ctx.font = "30px Verdana";
   //ctx.font = "30px Impact";
   ctx.textAlign="center";
-  ctx.fillText("Day X "+ zombieList.length + " " + bulletList.length,ctx.canvas.width / 2,50);
+  ctx.fillText(gameManager.statesText[gameManager.state] + " Day: " + gameManager.round + "\n "+ zombieList.length + " " + bulletList.length,ctx.canvas.width / 2,50);
 
   ctx.textAlign="left";
   ctx.fillText("Abilities",20, ctx.canvas.height - 20);
