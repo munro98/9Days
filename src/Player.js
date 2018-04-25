@@ -15,7 +15,7 @@ class Player extends Actor {
     //this.activeWeapon = new Sniper(new Vec2(0,0));
 
     this.altWeapon = new Rifle(new Vec2(0, 0));
-		this.activeWeapon = new Pistol(new Vec2(0, 0));
+		this.activeWeapon = new Sniper(new Vec2(0, 0));
 
     this.lastPos = this.pos.copy();
 
@@ -74,7 +74,7 @@ class Player extends Actor {
 
     // Move slower when going backwards
     let inputFactor = Math.min(Math.max(0,lookDotInput+1.5), 1);
-    console.log(inputFactor);
+    //console.log(inputFactor);
     var deltaPos = inputVec3;//.mul(inputFactor);
 
     
@@ -87,7 +87,7 @@ class Player extends Actor {
     // Do friction
     let newMag = this.vel.mag() - this.decel * deltaTime;
 
-    if (this.vel.mag() < 10) {
+    if (this.vel.mag() < 4) {
       this.vel = new Vec2(0, 0);
     }
 
@@ -139,6 +139,8 @@ class Player extends Actor {
         
       }
     }
+
+    // Firing bullets stuff
 
     this.timeSinceLastFire += deltaTime;
 

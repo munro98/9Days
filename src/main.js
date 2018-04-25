@@ -163,7 +163,7 @@ window.onload = async function() {
 
 
     level = new Level(100, tileImage, client.responseText);
-    setInterval(tick, 16);
+    tick(0.0);
 
     };
     tileImage.src = "res/tilesheet_complete.png";
@@ -182,8 +182,7 @@ window.onload = async function() {
   
   cameraPosition = player.pos.mul(-1).add(new Vec2 (ctx.canvas.width / 2 + 16, ctx.canvas.height / 2 + 16));
 
-  //ctx.fillRect(10, 10, 100, 100);
-  //setInterval(tick, 32);
+  
 };
 
 function levelLoaded() {
@@ -204,14 +203,32 @@ var scaleFitNative = 1;
 var lastDownKeys = new Set();
 var downKeysFrame = new Set();
 
-function tick() {
-  //doThing();
-  //ctx.canvas.width  = window.innerWidth;
-  //ctx.canvas.height = window.innerHeight;
+var first = false;
 
-  //var browserZoomLevel = Math.round(window.devicePixelRatio * 100);
-  //var z = ( window.outerWidth - 10 ) / window.innerWidth;
-  //console.log(ctx.canvas.width);
+function tick(currentTimeMilli) {
+
+  window.requestAnimationFrame(tick);
+
+  let currentTime = currentTimeMilli * 0.001;
+  deltaTime = currentTime - previousTime;
+  previousTime = currentTime;
+
+  if (!first) {
+    first = true;
+    deltaTime = 0.0;
+  }
+
+  runTime += deltaTime;
+
+
+  deltaTime *= 1.0;
+
+  console.log(runTime);
+
+  if (deltaTime > 0.02) {
+    deltaTime = 0.02;
+  }
+
 
   var currentDownKeys = new Set(keyCodeSet);
   downKeysFrame = new Set();
@@ -245,16 +262,6 @@ function tick() {
   ctx.canvas.style.width = '100%';
   ctx.canvas.style.height = '100%';
 
-  date = new Date();
-  var currentTime = date.getTime() / 1000.0;
-  deltaTime = currentTime - previousTime;
-  previousTime = currentTime;
-
-  //console.log(deltaTime);
-
-  runTime += deltaTime;
-  //deltaTime *= 0.2;
-
   gameManager.update(deltaTime);
   //gameManager.log();
 
@@ -266,8 +273,6 @@ function tick() {
 
   //cameraPosition = cameraPosition.add(cameraShake.offset);
   //cameraPosition.x += cameraShake.offset.x;//(new Vec2 (400, 0));
-
-
 
   //console.log(cameraPosition.x);
   
