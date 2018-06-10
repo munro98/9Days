@@ -1,15 +1,13 @@
 class Level{
   constructor (width, tileImage, xmlData) {
-    this.width = 100;
+    this.width = 100; // maps size in tiles
     this.tileImage = tileImage;
 
-    this.chunkSize = 16;
-    this.tileSize = 32;
+    this.chunkSize = 16; // tiles in a chunk
+    this.tileSize = 32; // pixels in tiles
     this.chunkCount = Math.ceil(this.width/this.chunkSize);
     this.chunkMap = new Array(this.chunkCount * this.chunkCount);
 
-    this.startX = 1;
-    this.startY = 1;
     this.endX = 20;
     this.endY = 10;
 
@@ -146,6 +144,28 @@ class Level{
     }
   }
 
+  drawParticleToChunk(px, py, texture) {
+
+    let tileX = (px) / this.tileSize >> 0;
+    let tileY = (py) / this.tileSize >> 0;
+
+    let chunkX = (tileX) / this.chunkSize >> 0;
+    let chunkY = (tileY) / this.chunkSize >> 0;
+
+    let chunkIndex = chunkX+chunkY*this.chunkCount;
+    if (chunkIndex < 0 || chunkIndex >= this.chunkCount*this.chunkCount)
+      return;
+
+    let chunk = this.chunkMap[chunkIndex];
+    //console.log(chunk);
+    if (!chunk) 
+      return;
+
+    let localChunkPosX = px - chunkX * this.chunkSize * this.tileSize;
+    let localChunkPosY = py - chunkY * this.chunkSize * this.tileSize;
+    chunk.ctx.drawImage(texture.image, 0, 0, 32, 32, localChunkPosX, localChunkPosY, 32, 32);
+  }
+
 
   drawLayer(vec, width, height, layer) {
     var startX = Math.max(0, Math.floor((-vec.x) / this.tileSize));
@@ -173,12 +193,6 @@ class Level{
     }
   }
 
-  aStarDraw(view) {
-
-
-
-  }
-
   hitPlayer (v){
     
     //if(this.pos.x+this.width / 2 < v.x || this.pos.x-this.width  / 2 > v.x ) return false;
@@ -190,10 +204,10 @@ class Level{
   hit (v){
     //var x = Math.floor((v.x) / this.tileSize );
     //var y = Math.floor((v.y) / this.tileSize );
-    var x = (v.x) / this.tileSize >> 0;
-    var y = (v.y) / this.tileSize >> 0;
+    let x = (v.x) / this.tileSize >> 0;
+    let y = (v.y) / this.tileSize >> 0;
 
-    var tileIndex = x+y*this.width;
+    let tileIndex = x+y*this.width;
     if (tileIndex < 0 || tileIndex >= this.width*this.width)
       return false;
 
@@ -284,9 +298,6 @@ class Level{
     if (this.checkSurroundingFree(endX, endY) != 4)
       return path;
 
-
-    this.startX = startX;
-    this.startY = startY;
     this.endX = endX;
     this.endY = endY;
 

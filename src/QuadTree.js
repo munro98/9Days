@@ -5,16 +5,12 @@ class QuadTree {
 		this.x = x;
 		this.y = y;
 		this.w = w;
+
 		this.depth = depth;
 
-		this.q0 = null;
-		this.q1 = null;
-		this.q2 = null;
-		this.q3 = null;
-
+		this.q = new Array(4);
 		this.isLeaf = false;
 		this.points = new Array();
-
 		this.selected = false;
 	}
 
@@ -27,7 +23,7 @@ class QuadTree {
 			return false;
 		}
 
-		if (this.points.length == 0 && this.isLeaf == false && this.q0 == null) { // This node is empty so make it a leaf
+		if (this.points.length == 0 && this.isLeaf == false && this.q[0] == null) { // This node is empty so make it a leaf
 			this.points.push(entity);
 			this.isLeaf = true;
 
@@ -39,10 +35,10 @@ class QuadTree {
 			//                   MaxElements      MaxDepth    
 			if (this.points.length >= 1 && this.depth < 32) { //
 
-				this.q0 = new QuadTree(this.x, this.y, this.w / 2, this.depth + 1);
-				this.q1 = new QuadTree(this.x + this.w / 2, this.y, this.w / 2, this.depth + 1);
-				this.q2 = new QuadTree(this.x, this.y + this.w / 2, this.w / 2, this.depth + 1);
-				this.q3 = new QuadTree(this.x + this.w / 2, this.y + this.w / 2, this.w / 2, this.depth + 1);
+				this.q[0] = new QuadTree(this.x, this.y, this.w / 2, this.depth + 1);
+				this.q[1] = new QuadTree(this.x + this.w / 2, this.y, this.w / 2, this.depth + 1);
+				this.q[2] = new QuadTree(this.x, this.y + this.w / 2, this.w / 2, this.depth + 1);
+				this.q[3] = new QuadTree(this.x + this.w / 2, this.y + this.w / 2, this.w / 2, this.depth + 1);
 
 				this.isLeaf = false; // Quadrant 0 is no longer a leaf node
 
@@ -51,29 +47,19 @@ class QuadTree {
 				var unfitList = new Array();
 				while (this.points.length > 0) {
 					var temp = this.points.pop();
+					if (!this.q[0].addEntity(temp)) {
 
-					if (!this.q0.addEntity(temp)) {
+						if (!this.q[1].addEntity(temp)) {
 
-						if (!this.q1.addEntity(temp)) {
+							if (!this.q[2].addEntity(temp)) {
 
-							if (!this.q2.addEntity(temp)) {
-
-								if (!this.q3.addEntity(temp)) {
+								if (!this.q[3].addEntity(temp)) {
 
 									unfitList.push(temp);
-
-								} else {
-									insertionCounter++;
-								}
-							} else {
-								insertionCounter++;
-							}
-						} else {
-							insertionCounter++;
-						}
-					} else {
-						insertionCounter++;
-					}
+								} else {insertionCounter++;}
+							} else {insertionCounter++;}
+						} else {insertionCounter++;}
+					} else {insertionCounter++;}
 				}
 
 				// These elements couldn't fit in children
@@ -81,17 +67,10 @@ class QuadTree {
 				this.points = unfitList;
 
 				// Try insert new element into children
-				if (this.q0.addEntity(entity)) {
-					return true;
-				}
-				if (this.q1.addEntity(entity)) {
-					return true;
-				}
-				if (this.q2.addEntity(entity)) {
-					return true;
-				}
-				if (this.q3.addEntity(entity)) {
-					return true;
+				for (let i = 0; i < 4; i++) {
+					if (this.q[i].addEntity(entity)) {
+						return true;
+					}
 				}
 				// New element couldn't fit in children
 				this.points.push(entity);
@@ -100,27 +79,19 @@ class QuadTree {
 				if (insertionCounter == 0) {
 					this.isLeaf = true; // We are now a leaf node again
 
-					this.q0 = null;
-					this.q1 = null;
-					this.q2 = null;
-					this.q3 = null;
+					this.q[0] = null;
+					this.q[1] = null;
+					this.q[2] = null;
+					this.q[3] = null;
 				}
 
 				return true;
 			}
 		} else { // This node has children nodes so try insert new element into them
-			//console.log("TEST");
-			if (this.q0.addEntity(entity)) {
-				return true;
-			}
-			if (this.q1.addEntity(entity)) {
-				return true;
-			}
-			if (this.q2.addEntity(entity)) {
-				return true;
-			}
-			if (this.q3.addEntity(entity)) {
-				return true;
+			for (let i = 0; i < 4; i++) {
+				if (this.q[i].addEntity(entity)) {
+					return true;
+				}
 			}
 			// The new element couldn't fit so keep them in this node
 			this.points.push(entity);
@@ -141,86 +112,52 @@ class QuadTree {
 		}
 		ctx.restore();
 
-
-		if (this.q0 != null) {
-			this.q0.drawQuads(cameraPosition);
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				this.q[i].drawQuads(cameraPosition);
+			}
 		}
-		if (this.q1 != null) {
-			this.q1.drawQuads(cameraPosition);
-		}
-		if (this.q2 != null) {
-			this.q2.drawQuads(cameraPosition);
-		}
-		if (this.q3 != null) {
-			this.q3.drawQuads(cameraPosition);
-		}
-
 	}
 
 	//Draws all points within the subtree
 	drawLeaves() {
-		//if (this.q0 == null && this.q1 == null && this.q2 == null && this.q3 == null) {
 		for (var i = 0; i < this.points.length; i++) {
 			var p = this.points[i];
 			//ctx.strokeRect(p.x, p.y,80,80);
 			p.draw();
 		}
-		//}
 
-		if (this.q0 != null) {
-			this.q0.drawLeaves();
-		}
-		if (this.q1 != null) {
-			this.q1.drawLeaves();
-		}
-		if (this.q2 != null) {
-			this.q2.drawLeaves();
-		}
-		if (this.q3 != null) {
-			this.q3.drawLeaves();
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				this.q[i].drawLeaves();
+			}
 		}
 	}
 
 	deselectLeaves() {
 		this.selected = false;
-		if (this.q0 != null) {
-			this.q0.deselectLeaves();
-		}
-		if (this.q1 != null) {
-			this.q1.deselectLeaves();
-		}
-		if (this.q2 != null) {
-			this.q2.deselectLeaves();
-		}
-		if (this.q3 != null) {
-			this.q3.deselectLeaves();
+
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				this.q[i].deselectLeaves();
+			}
 		}
 	}
 
 	selectLeaves(entity) {
-
 		if (entity.pos.x + entity.width < this.x || entity.pos.x > this.x + this.w) return false;
 		if (entity.pos.y + entity.height < this.y || entity.pos.y > this.y + this.w) return false;
-		//console.log("selected");
+
 		this.selected = true;
 
-		if (this.q0 != null) {
-			this.q0.selectLeaves(entity);
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				this.q[i].selectLeaves(entity);
+			}
 		}
-		if (this.q1 != null) {
-			this.q1.selectLeaves(entity);
-		}
-		if (this.q2 != null) {
-			this.q2.selectLeaves(entity);
-		}
-		if (this.q3 != null) {
-			this.q3.selectLeaves(entity);
-		}
-
 	}
 
 	selectBoxes(entity) {
-
 		var result = new Array();
 
 		if (entity.pos.x + entity.width < this.x || entity.pos.x > this.x + this.w) return result;
@@ -230,25 +167,15 @@ class QuadTree {
 			result = result.concat(this.points);
 		}
 
-		if (this.q0 != null) {
-			result = result.concat(this.q0.selectBoxes(entity));
-			//result = result.concat(this.q0.points);
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				result = result.concat(this.q[i].selectBoxes(entity));
+			}
 		}
-		if (this.q1 != null) {
-			result = result.concat(this.q1.selectBoxes(entity));
-		}
-		if (this.q2 != null) {
-			result = result.concat(this.q2.selectBoxes(entity));
-		}
-		if (this.q3 != null) {
-			result = result.concat(this.q3.selectBoxes(entity));
-		}
-
 		return result;
 	}
 
 	selectPoints(entity) {
-		//console.log(entity.pos.x);
 
 		var result = new Array();
 
@@ -259,17 +186,10 @@ class QuadTree {
 			result = result.concat(this.points);
 		}
 
-		if (this.q0 != null) {
-			result = result.concat(this.q0.selectPoints(entity));
-		}
-		if (this.q1 != null) {
-			result = result.concat(this.q1.selectPoints(entity));
-		}
-		if (this.q2 != null) {
-			result = result.concat(this.q2.selectPoints(entity));
-		}
-		if (this.q3 != null) {
-			result = result.concat(this.q3.selectPoints(entity));
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				result = result.concat(this.q[i].selectPoints(entity));
+			}
 		}
 
 		return result;
@@ -278,17 +198,10 @@ class QuadTree {
 	countElements() {
 		var count = this.points.length;
 
-		if (this.q0 != null) {
-			count += this.q0.countElements();
-		}
-		if (this.q1 != null) {
-			count += this.q1.countElements();
-		}
-		if (this.q2 != null) {
-			count += this.q2.countElements();
-		}
-		if (this.q3 != null) {
-			count += this.q3.countElements();
+		for (let i = 0; i < 4; i++) {
+			if (this.q[i] != null) {
+				count += this.q[i].countElements();
+			}
 		}
 		return count;
 	}

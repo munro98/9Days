@@ -99,33 +99,12 @@ class Player extends Actor {
       this.vel = this.vel.normalized().mul(this.maxVel * inputFactor);
     }
 
-    /*
-    if (this.vel.mag() > this.maxVel) {
-      this.vel = this.vel.normalized().mul(this.maxVel);
-    }
-
-    var deceleration = this.decel * deltaTime;
-    //console.log(this.decel);
-    if (inputVec3.mag() == 0) {
-      //var decelerationVec3 = new Vec3(0, 0, 0); TODO Make deceleration normalized
-      if (this.vel.x > 0) {
-        this.vel.x = Math.max(this.vel.x - deceleration, 0);
-      } else {
-        this.vel.x = Math.min(this.vel.x + deceleration, 0);
-      }
-      if (this.vel.y > 0) {
-        this.vel.y = Math.max(this.vel.y - deceleration, 0);
-      } else {
-        this.vel.y = Math.min(this.vel.y + deceleration, 0);
-      }
-    }
-    */
-
-
+    //TODO: update this code
     if (downKeysFrame.has(69)) {
-      console.log("sdg")
+      //console.log("sdg")
       for (var i = 0; i < guns.length; i++) {
-        if (guns[i].hit(this.getCenter())) { //.add(new Vec2(this.width / 2, this.height / 2))
+        if (guns[i].hit(this.getCenter())) {
+
           if (this.altWeapon == null) {
             this.altWeapon = this.activeWeapon;
             this.activeWeapon = guns[i];
@@ -135,6 +114,8 @@ class Player extends Actor {
           
           guns.splice(i, 1);
           i--;
+
+          break;
         }
         
       }
@@ -159,7 +140,6 @@ class Player extends Actor {
 
     if (this.timeSinceLastFire > this.activeWeapon.timeBetweenShots && mouseDown && this.activeWeapon.ammo > 0) {
 
-
       this.timeSinceLastFire = 0;
       //playSound();
       for (var i = 0; i < this.activeWeapon.bulletsEachShot; i++) {
@@ -168,7 +148,7 @@ class Player extends Actor {
         bulletVec2 = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
 
 
-        var bullet = new Bullet(this.getCenter(), this.activeWeapon.damage); // , -offsetAngle * 180 / Math.PI
+        var bullet = new Bullet(this.getCenter(), this.activeWeapon.damage);
         bullet.vel = bulletVec2.normalized().mul(this.activeWeapon.bulletSpeed);
         bulletList.push(bullet);
         
@@ -178,8 +158,6 @@ class Player extends Actor {
 
     //if (onKeyDownCodeSet.has(69)) {
     
-
-
     super.update();
   }
 

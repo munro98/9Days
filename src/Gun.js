@@ -70,3 +70,5 @@ class BoomStick extends Gun {
       super(64, pos,"res/rifle.png", 0.4, 60, 20, 8, 60, 1000);
     }
 }
+
+var Guns = [PulseWave, Rifle];

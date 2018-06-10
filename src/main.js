@@ -52,8 +52,6 @@ var onKeyDownCodeSet = new Set();
 var keyCodeSet = new Set();
 
 var runTime = 0;
-var time2 = 0;
-
 
 function playSound() {
     var source = context.createBufferSource();
@@ -69,9 +67,6 @@ pulse wave gun
 using sniper gives extended view range
 add dash mechanic
 fix sniper spread
-A* fix zombies merging
-place zombie spawners
-gui show gamestate
 scoreboard
 respawning
 playerid/team in bullet class
@@ -94,6 +89,7 @@ and concurrency in swapWeapons
 zombies looking direction
 improve spawn system
 zombies do damage to player
+update picking up guns
 
 
 
@@ -103,9 +99,6 @@ var ctx;
 
 var background;
 var bullet;
-var fence;
-
-
 var deltaTime = 0.0;
 var previousTime = 0.0;
 
@@ -116,12 +109,6 @@ var cameraPosition;
 var gameManager;
 
 var width = 20;
-
-var grid;
-
-
-
-
 
 window.onload = async function() {
   date = new Date();
@@ -136,38 +123,20 @@ window.onload = async function() {
   ctx.canvas.width  = window.innerWidth;
   ctx.canvas.height = window.innerHeight;
 
-  background = new Image();
-  background.src = "res/grass.jpeg";
-
-  fence = new Image();
-  fence.src = "res/fence.png";
-
-
-
-
-
-
   var client = new XMLHttpRequest();
   client.open('GET', 'res/untitled.tmx');
   client.onload = function() {
 
     //console.log(client.responseText);
 
-    
-
-    //console.log(this.grid);
-
-
     tileImage = new Image();
     tileImage.onload = function() {
-
-
     level = new Level(100, tileImage, client.responseText);
     tick(0.0);
 
     };
-    tileImage.src = "res/tilesheet_complete.png";
 
+    tileImage.src = "res/tilesheet_complete.png";
 
   }
   client.send();
@@ -223,7 +192,7 @@ function tick(currentTimeMilli) {
 
   deltaTime *= 1.0;
 
-  console.log(runTime);
+  //console.log(runTime);
 
   if (deltaTime > 0.02) {
     deltaTime = 0.02;
@@ -275,8 +244,7 @@ function tick(currentTimeMilli) {
   //cameraPosition.x += cameraShake.offset.x;//(new Vec2 (400, 0));
 
   //console.log(cameraPosition.x);
-  
-  time2 += deltaTime;
+
 
   var mouseWorld = new Vec2(mouseX, mouseY);
   mouseWorld = mouseWorld.sub(cameraPosition);
@@ -300,22 +268,21 @@ function tick(currentTimeMilli) {
 
   ctx.lineTo(mouseX, mouseY);
   ctx.stroke();
-  
-  
-
-  if (time2 > 1) {
-    time2 = 0;
-    //zombieList.push(new Zombie(new Vec2(100, 100)));
-  }
-
 
   //level.aStarSearch(zombieGrid.x, zombieGrid.y, mouseWorldGrid.x, mouseWorldGrid.y);
 
+  var playersAndZombies = zombieList.concat(player);
+  //Build Quadtree
+  var quadTree = new QuadTree(0, 0, 3200, 0);
+  quadTree.addEntity(player);
+  for (var j = 0; j < zombieList.length; j++) {
+    quadTree.addEntity(zombieList[j]);
+  }
+
+  //Update game objects
   
   player.update();
 
-
-  
   for (var i = 0; i < zombieList.length; i++) {
     zombieList[i].update();
   }
@@ -328,15 +295,7 @@ function tick(currentTimeMilli) {
 
   particleManager.update(level, deltaTime);
 
-
-  var playersAndZombies = zombieList.concat(player);
-
-  //Build Quadtree
-  var quadTree = new QuadTree(0, 0, 3200, 0);
-  quadTree.addEntity(player);
-  for (var j = 0; j < zombieList.length; j++) {
-    quadTree.addEntity(zombieList[j]);
-  }
+  
   
   //console.log("els" + quadTree.countElements());
   ///*
@@ -436,6 +395,8 @@ function tick(currentTimeMilli) {
     height: cameraBox.y,
   }
 
+  particleManager.render(cameraPosition);
+
   var potentialCollisions = quadTree.selectBoxes(cameraPosAndBox);
   for (var i = 0; i < potentialCollisions.length; i++) {
     potentialCollisions[i].draw(cameraPosition);
@@ -449,10 +410,10 @@ function tick(currentTimeMilli) {
     bulletList[i].draw(cameraPosition, cameraBox);
   }
 
-  particleManager.render(cameraPosition);
+  
 
   //player.draw(cameraPosition);
-  quadTree.drawQuads(cameraPosition);
+  //quadTree.drawQuads(cameraPosition);
 
   //for (var n of zombieList[0].path) {
   //  ctx.fillRect(cameraPosition.x + n.x*level.tileSize, cameraPosition.y+n.y*level.tileSize,level.tileSize,level.tileSize);
@@ -469,7 +430,7 @@ function tick(currentTimeMilli) {
   ctx.fillText("Abilities",20, ctx.canvas.height - 20);
 
   ctx.textAlign="right";
-  ctx.fillText("Ammo: " + player.activeWeapon.ammo,ctx.canvas.width - 20, ctx.canvas.height - 20);
+  ctx.fillText("HP: " + player.health + " Ammo: " + player.activeWeapon.ammo,ctx.canvas.width - 20, ctx.canvas.height - 20);
 
 
   lastDownKeys = currentDownKeys;

@@ -1,13 +1,24 @@
 class ParticleManager
 {
     constructor() {
-        this.particleCount = 256;
 
+        this.types = {
+            DEBRI : 0,
+            BLOOD : 1,
+            FIRE : 2,
+            SMOKE : 3,
+        };
+
+        this.particleCount = 256;
         this.positions = new Float32Array(this.particleCount * 2);
         this.velocities = new Float32Array(this.particleCount * 2);
-        this.colors = new Float32Array(this.particleCount * 3);
+        //this.colors = new Float32Array(this.particleCount * 3);
 
         this.lifeTimes = new Float32Array(this.particleCount);
+        this.particleType = new Uint8Array(this.particleCount);
+        this.isAlive = new Uint8Array(this.particleCount);
+        
+        console.log(this.types.DEBRI);
 
         this.currentParticle = 0;
 
@@ -18,8 +29,15 @@ class ParticleManager
     createParticle(pos, vel, color, lifeTime) {
 
         let i = this.currentParticle;
+
+        if (this.isAlive[i] == 1) {
+            this.isAlive[i] = 0;
+            level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture);
+        }
         
         this.lifeTimes[i] = lifeTime;
+
+        this.isAlive[i] = 1;
 
         this.positions[i* 2] = pos.x;
         this.positions[i* 2+1] = pos.y;
@@ -27,9 +45,9 @@ class ParticleManager
         this.velocities[i* 2] = vel.x;
         this.velocities[i* 2+1] = vel.y;
 
-        this.colors[i* 2] = color.x;
-        this.colors[i* 2+1] = color.y;
-        this.colors[i* 2+2] = color.z;
+        //this.colors[i* 2] = color.x;
+        //this.colors[i* 2+1] = color.y;
+        //this.colors[i* 2+2] = color.z;
 
         this.currentParticle++;
         this.currentParticle = this.currentParticle % this.particleCount;
@@ -41,6 +59,16 @@ class ParticleManager
         for (let i = 0; i < this.particleCount; i++) {
 
             this.lifeTimes[i] -= deltaTime;
+
+            if (this.lifeTimes[i] < 0) {
+                if (this.isAlive[i] == 1) {
+                    this.isAlive[i] = 0;
+                    level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture)
+
+                    //console.log("particleded");
+                }
+                continue;
+            }
 
             let vel = new Vec2(this.velocities[i* 2], this.velocities[i* 2+1]);
 
@@ -71,7 +99,7 @@ class ParticleManager
 
         for (let i = 0; i < this.particleCount; i++) {
 
-            if (this.lifeTimes[i] < 0) {
+            if (this.isAlive[i] == 0) {
                 continue;
             }
 

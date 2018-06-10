@@ -128,7 +128,7 @@ class Entity {
     ctx.save();
     ctx.translate(vec.x,vec.y); //  +this.height*0.5
     ctx.strokeStyle = "rgb(255,0,0)";
-    ctx.strokeRect(0, 0,this.width,this.height);
+    //ctx.strokeRect(0, 0,this.width,this.height);
 
     ctx.translate(+this.width*0.5, +this.width*0.5);
     ctx.rotate(this.rotation * Math.PI/180);

@@ -14,10 +14,31 @@ class Zombie extends Actor {
 
     this.periodicTimer = new PeriodicTimer(0.6, true, true);
 
+    this.timeSinceLastAttack = 0;
+    this.timeBetweenAttack = 0.5;
     
   }
 
   update (){
+
+    if (this.health < 0 && !this.remove) {
+
+      guns.push(new Rifle(this.pos.copy()));
+
+      let rand = Math.random() * 100;
+      if (rand > 20) {
+        let rand = Math.random() * 100;
+        let randInt = Math.floor(Math.random()*4);
+
+      }
+    }
+
+    if (this.timeSinceLastAttack > this.timeBetweenAttack) {
+      //vec forward =
+      //let attack box = 
+      // get all players in attach box
+      // attack the first one
+    }
 
     if (this.periodicTimer.trigger()) {
 
