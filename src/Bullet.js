@@ -34,7 +34,6 @@ class Bullet {
 
 
       for (let i = 0; i < 5; i++) {
-
         //let offsetAngle = this.rotation * Math.PI / 180;//
         let offsetAngle = this.rotation;
         let particleVec = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
@@ -49,7 +48,7 @@ class Bullet {
         dir = new Vec2(Math.sin(ang), Math.cos(ang));
         //console.log(dir.x);
 
-        particleManager.createParticle(this.pos, dir.mul(500+Math.random()*500), {x: 255, y: 0, z: 0}, 20+Math.random()*10);
+        particleManager.createParticle(this.pos, dir.mul(500+Math.random()*500), ParticleManager.types.DEBRI, 20+Math.random()*10);
 
       }
     }

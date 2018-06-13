@@ -16,12 +16,44 @@ class Zombie extends Actor {
 
     this.timeSinceLastAttack = 0;
     this.timeBetweenAttack = 0.5;
+
+    this.lastHitVel = new Vec2(0, 0);
     
   }
 
   update (){
 
     if (this.health < 0 && !this.remove) {
+      this.remove = true;
+
+      let spread = 45;
+
+      for (let i = 0; i < 5; i++) {
+
+        //let offsetAngle = this.rotation * Math.PI / 180;//
+        //let offsetAngle = this.rotation;
+        //let particleVec = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
+        let particleVec = this.lastHitVel;
+
+        let dir = particleVec;
+        let ang = -Math.atan2(dir.y, dir.x); // In radians
+        ang += 90 * (Math.PI / 180);
+
+        ang += (Math.random() * spread - (spread * 0.5) ) * (Math.PI / 180);
+
+
+        dir = new Vec2(Math.sin(ang), Math.cos(ang));
+        //console.log(dir.x);
+
+        if (i < 3) {
+          for (let j = 0; j < 4; j++) {
+            particleManager.createParticle(this.pos, dir.mul(particleVec.mag()/4+Math.random()*500), ParticleManager.types.BLOOD, 20+Math.random()*10);
+          }
+        }
+
+        particleManager.createParticle(this.pos, dir.mul(particleVec.mag()/4+Math.random()*500), ParticleManager.types.BLOOD, 20+Math.random()*10);
+
+      }
 
       guns.push(new Rifle(this.pos.copy()));
 

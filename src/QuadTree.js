@@ -78,11 +78,10 @@ class QuadTree {
 				//We could't fit anything in sub nodes so delete them
 				if (insertionCounter == 0) {
 					this.isLeaf = true; // We are now a leaf node again
-
-					this.q[0] = null;
-					this.q[1] = null;
-					this.q[2] = null;
-					this.q[3] = null;
+					
+					for (let i = 0; i < 4; i++) {
+						this.q[i] = null;
+					}
 				}
 
 				return true;

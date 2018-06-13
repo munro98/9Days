@@ -15,7 +15,8 @@ class Player extends Actor {
     //this.activeWeapon = new Sniper(new Vec2(0,0));
 
     this.altWeapon = new Rifle(new Vec2(0, 0));
-		this.activeWeapon = new Sniper(new Vec2(0, 0));
+    //this.activeWeapon = new Sniper(new Vec2(0, 0));
+    this.activeWeapon = new SuperRifle(new Vec2(0, 0));
 
     this.lastPos = this.pos.copy();
 

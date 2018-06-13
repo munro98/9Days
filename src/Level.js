@@ -1,5 +1,7 @@
 class Level{
   constructor (width, tileImage, xmlData) {
+
+    this.tileSheetTilesPerInRow = 54;
     this.width = 100; // maps size in tiles
     this.tileImage = tileImage;
 
@@ -134,8 +136,8 @@ class Level{
           }
           //console.log(tile);
 
-          var tileX =  tile % 54; // 54 is the number of tiles in each row
-          var tileY = Math.floor(tile/54);
+          var tileX =  tile % this.tileSheetTilesPerInRow;
+          var tileY = Math.floor(tile/this.tileSheetTilesPerInRow);
 
           chunk.ctx.drawImage(this.tileImage, tileX * this.tileSize, tileY * this.tileSize, this.tileSize, this.tileSize, xx * this.tileSize, yy * this.tileSize, this.tileSize, this.tileSize);
           this.drawsFrame++;
@@ -144,7 +146,7 @@ class Level{
     }
   }
 
-  drawParticleToChunk(px, py, texture) {
+  drawParticleToChunk(px, py, texture, tTileX, tTileY, particleManager) {
 
     let tileX = (px) / this.tileSize >> 0;
     let tileY = (py) / this.tileSize >> 0;
@@ -161,9 +163,10 @@ class Level{
     if (!chunk) 
       return;
 
+
     let localChunkPosX = px - chunkX * this.chunkSize * this.tileSize;
     let localChunkPosY = py - chunkY * this.chunkSize * this.tileSize;
-    chunk.ctx.drawImage(texture.image, 0, 0, 32, 32, localChunkPosX, localChunkPosY, 32, 32);
+    chunk.ctx.drawImage(texture.image, tTileX * particleManager.tileSize, tTileY * particleManager.tileSize, particleManager.tileSize, particleManager.tileSize, localChunkPosX , localChunkPosY, particleManager.tileSize, particleManager.tileSize);
   }
 
 
@@ -183,8 +186,8 @@ class Level{
             continue;
           }
 
-          var tileX =  tile % 54; // 54 is the number of tiles in each row
-          var tileY = Math.floor(tile/54);
+          var tileX =  tile % this.tileSheetTilesPerInRow; 
+          var tileY = Math.floor(tile/this.tileSheetTilesPerInRow);
           //
           ctx.drawImage(this.tileImage, tileX * this.tileSize, tileY * this.tileSize, this.tileSize, this.tileSize, vec.x + x * this.tileSize,vec.y + y * this.tileSize, this.tileSize, this.tileSize);
           this.drawsFrame++;

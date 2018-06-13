@@ -1,38 +1,35 @@
 class ParticleManager
 {
     constructor() {
-
-        this.types = {
-            DEBRI : 0,
-            BLOOD : 1,
-            FIRE : 2,
-            SMOKE : 3,
-        };
-
-        this.particleCount = 256;
+        this.particleCount = 1024;
         this.positions = new Float32Array(this.particleCount * 2);
         this.velocities = new Float32Array(this.particleCount * 2);
         //this.colors = new Float32Array(this.particleCount * 3);
 
         this.lifeTimes = new Float32Array(this.particleCount);
-        this.particleType = new Uint8Array(this.particleCount);
+        this.particleTypes = new Uint8Array(this.particleCount);
         this.isAlive = new Uint8Array(this.particleCount);
-        
-        console.log(this.types.DEBRI);
 
         this.currentParticle = 0;
 
         //this.texture = "res/player.png";
-        this.texture = new Texture("res/debris.png");
+        this.tileSize = 16;
+        this.textureTilesPerRow = 4;
+        this.texture = new Texture("res/particles.png");
     }
 
-    createParticle(pos, vel, color, lifeTime) {
+    createParticle(pos, vel, type, lifeTime) {
 
         let i = this.currentParticle;
 
         if (this.isAlive[i] == 1) {
             this.isAlive[i] = 0;
-            level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture);
+
+            let type = this.particleTypes[i];
+            let tileX = type % this.textureTilesPerRow;
+            let tileY = (type / this.textureTilesPerRow) >> 0;
+            
+            level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture, tileX, tileY, this);
         }
         
         this.lifeTimes[i] = lifeTime;
@@ -45,9 +42,8 @@ class ParticleManager
         this.velocities[i* 2] = vel.x;
         this.velocities[i* 2+1] = vel.y;
 
-        //this.colors[i* 2] = color.x;
-        //this.colors[i* 2+1] = color.y;
-        //this.colors[i* 2+2] = color.z;
+        this.particleTypes[i] = type;
+
 
         this.currentParticle++;
         this.currentParticle = this.currentParticle % this.particleCount;
@@ -63,7 +59,12 @@ class ParticleManager
             if (this.lifeTimes[i] < 0) {
                 if (this.isAlive[i] == 1) {
                     this.isAlive[i] = 0;
-                    level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture)
+
+                    let type = this.particleTypes[i];
+                    let tileX = type % this.textureTilesPerRow;
+                    let tileY = (type / this.textureTilesPerRow) >> 0;
+
+                    level.drawParticleToChunk(this.positions[i* 2], this.positions[i* 2+1], this.texture, tileX, tileY, this);
 
                     //console.log("particleded");
                 }
@@ -110,14 +111,22 @@ class ParticleManager
             vec.x = Math.floor(vec.x);
             vec.y = Math.floor(vec.y);
 
-            //ctx.save();
-            //ctx.translate(vec.x,vec.y);
-            //ctx.drawImage(texture.getTexture(this.texture), -32/2, -32/2);
-            ctx.drawImage(this.texture.image, 0, 0, 32, 32, vec.x ,vec.y, 32, 32);
-            //ctx.drawImage(this.texture.image, -32/2, -32/2);
-            //ctx.restore();
+
+            let type = this.particleTypes[i];
+            let tileX = type % this.textureTilesPerRow;
+            let tileY = (type / this.textureTilesPerRow) >> 0;
+
+            ctx.drawImage(this.texture.image, tileX * this.tileSize, tileY * this.tileSize, this.tileSize, this.tileSize, vec.x ,vec.y, this.tileSize, this.tileSize);
 
         }
 
     }
 }
+
+ParticleManager.tileSize = 16;
+ParticleManager.types = {
+    DEBRI : 0,
+    BLOOD : 1,
+    FIRE : 2,
+    SMOKE : 3,
+};

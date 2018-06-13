@@ -110,6 +110,12 @@ var gameManager;
 
 var width = 20;
 
+let lastFrameIndex = 0;
+let frames = new Array(4);
+frames.fill(0.0);
+
+let fps = 0;
+
 window.onload = async function() {
   date = new Date();
   var currentTime = date.getTime() / 1000.0;
@@ -188,9 +194,24 @@ function tick(currentTimeMilli) {
   }
 
   runTime += deltaTime;
-
-
   deltaTime *= 1.0;
+
+  let runTimeFloored = runTime >> 0;
+
+  let frameIndex = runTimeFloored % frames.length;
+  if (frameIndex != lastFrameIndex) {
+    frames[frameIndex] = frames.length;
+  }
+  frames[frameIndex]++;
+  lastFrameIndex = frameIndex;
+
+  let sum = 0;
+  for (let i = 0; i < frames.length; i++) {
+    if (i == frameIndex)
+      continue;
+    sum += frames[i];
+  }
+  fps = sum / (frames.length-1);
 
   //console.log(runTime);
 
@@ -303,7 +324,6 @@ function tick(currentTimeMilli) {
   // Don't let players and zombies get inside each other
   for (var j = 0; j < playersAndZombies.length; j++) {
     var potentialCollisions = quadTree.selectBoxes(playersAndZombies[j]);
-    //console.log(potentialCollisions.length);
     for (var i = 0; i < potentialCollisions.length; i++) {
       if (playersAndZombies[j] == potentialCollisions[i])
         continue;
@@ -314,14 +334,13 @@ function tick(currentTimeMilli) {
     }
   }
   //*/
+  
   //Bullets hitting zombies
   for (var j = 0; j < bulletList.length; j++) {
-    //console.log(bulletList[j]);
     if (bulletList[j].remove == true)
       continue;
 
     var potentialCollisions = quadTree.selectPoints(bulletList[j].pos);
-    //console.log(potentialCollisions.length);
     label1:
     for (var i = 0; i < potentialCollisions.length; i++) {
       if (potentialCollisions[i] == player)
@@ -334,6 +353,7 @@ function tick(currentTimeMilli) {
 
         if (potentialCollisions[i].isPointIntersecting2(    bulletList[j].pos.add(bulletList[j].vel.mul(deltaTime*fraction))     )) {
           potentialCollisions[i].health -= bulletList[j].damage;
+          potentialCollisions[i].lastHitVel = bulletList[j].vel;
           bulletList[j].remove = true;
           break label1;
         }
@@ -346,18 +366,6 @@ function tick(currentTimeMilli) {
 
     
   }
-
-  /*
-  var potentialCollisions = quadTree.selectBoxes(player);
-  for (var i = 0; i < potentialCollisions.length; i++) {
-    //console.log("ow" + potentialCollisions[i].pos);
-    if (player == potentialCollisions[i])
-      continue;
-    if (player.isIntersecting(potentialCollisions[i])) {
-      console.log("ow");
-    }
-  }
-  */
 
 
   //Remove entites
@@ -426,8 +434,10 @@ function tick(currentTimeMilli) {
   ctx.textAlign="center";
   ctx.fillText(gameManager.statesText[gameManager.state] + " Day: " + gameManager.round + "\n "+ zombieList.length + " " + bulletList.length,ctx.canvas.width / 2,50);
 
-  ctx.textAlign="left";
-  ctx.fillText("Abilities",20, ctx.canvas.height - 20);
+  //ctx.textAlign="left";
+  //ctx.fillText("Abilities",20, ctx.canvas.height - 20);
+
+  ctx.fillText("FPS: " + Math.round(fps), 20, 50);
 
   ctx.textAlign="right";
   ctx.fillText("HP: " + player.health + " Ammo: " + player.activeWeapon.ammo,ctx.canvas.width - 20, ctx.canvas.height - 20);

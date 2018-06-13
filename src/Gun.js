@@ -26,19 +26,19 @@ class Gun extends Entity {
   }
 }
 
-class Pistol extends Gun {
+class Pistol extends Gun { // smg1_fire1
   constructor (pos) {
       super(64, pos, "res/pistol.png", 0.2, 25, 14, 1, 999, 1000);
     }
 }
 
-class PulseWave extends Gun {
+class Deagle extends Gun { // deagle_fire
   constructor (pos) {
-      super(64, pos, "res/pistol.png", 0.4, 25, 14, 60, 999, 800);
+      super(64, pos, "res/pistol.png", 0.2, 25, 14, 1, 999, 1000);
     }
 }
 
-class Rifle extends Gun {
+class Rifle extends Gun { // mk20_sfire
   constructor (pos) {
       super(64, pos,"res/rifle.png", 0.1, 30, 8, 1, 330, 1500);
     }
@@ -50,25 +50,38 @@ class SuperRifle extends Gun {
     }
 }
 
+class Uzi extends Gun { // mk20_sfire
+  constructor (pos) {
+      super(64, pos,"res/rifle.png", 0.1, 30, 8, 1, 330, 1500);
+    }
+}
 
-class Sniper extends Gun {
+
+class Sniper extends Gun { // mk20_fire
   constructor (pos) {
       super(64, pos,"res/fence.png", 0.4, 120, 0.00, 1, 90, 4000);
     }
 }
 
 
-class ShotGun extends Gun {
+class PenatratorSniper extends Gun { // Sniper
+  constructor (pos) {
+      super(64, pos,"res/fence.png", 0.4, 120, 0.00, 1, 90, 4000);
+    }
+}
+
+
+class ShotGun extends Gun { // shotgun_fire
   constructor (pos) {
       super(64, pos,"res/rifle.png", 0.4, 60, 20, 5, 60, 1000);
     }
 }
 
 // Add mass knockback on player and target
-class BoomStick extends Gun {
+class BoomStick extends Gun { // shotgun_dbl_fire
   constructor (pos) {
       super(64, pos,"res/rifle.png", 0.4, 60, 20, 8, 60, 1000);
     }
 }
 
-var Guns = [PulseWave, Rifle];
+var Guns = [Sniper, Rifle, ShotGun, BoomStick];
