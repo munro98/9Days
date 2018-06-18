@@ -4,7 +4,6 @@ class ParticleManager
         this.particleCount = 1024;
         this.positions = new Float32Array(this.particleCount * 2);
         this.velocities = new Float32Array(this.particleCount * 2);
-        //this.colors = new Float32Array(this.particleCount * 3);
 
         this.lifeTimes = new Float32Array(this.particleCount);
         this.particleTypes = new Uint8Array(this.particleCount);
@@ -12,7 +11,6 @@ class ParticleManager
 
         this.currentParticle = 0;
 
-        //this.texture = "res/player.png";
         this.tileSize = 16;
         this.textureTilesPerRow = 4;
         this.texture = new Texture("res/particles.png");
@@ -93,7 +91,7 @@ class ParticleManager
     }
 
 
-    render(view) {
+    render(view, cameraBound) {
 
         //let i = 0;
         //ctx.drawImage(chunk.offscreenCanvas, 0, 0, chunk.offscreenCanvas.width, chunk.offscreenCanvas.height, vec.x + i * (this.tileSize*this.chunkSize),vec.y + j * (this.tileSize*this.chunkSize), chunk.offscreenCanvas.width, chunk.offscreenCanvas.height);
@@ -107,10 +105,16 @@ class ParticleManager
             let posX = this.positions[i* 2];
             let posY = this.positions[i* 2+1];
 
-            var vec = view.add(new Vec2(posX, posY));
-            vec.x = Math.floor(vec.x);
-            vec.y = Math.floor(vec.y);
+            let vec = view.add(new Vec2(posX, posY));
+            vec.x = vec.x >> 0;
+            vec.y = vec.y >> 0;
 
+            /*
+            if (vec.x < 0|| vec.y < 0)
+            return;
+            if (vec.x > cameraBound.x || vec.y > cameraBound.y)
+            return;
+            */
 
             let type = this.particleTypes[i];
             let tileX = type % this.textureTilesPerRow;
@@ -129,4 +133,5 @@ ParticleManager.types = {
     BLOOD : 1,
     FIRE : 2,
     SMOKE : 3,
+    SPARK : 4,
 };

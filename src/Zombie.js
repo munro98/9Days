@@ -1,6 +1,7 @@
 class Zombie extends Actor {
   constructor (pos) {
     super(64, pos)
+    this.tileIndex = 4;
 
     this.health = 100;
 
@@ -9,19 +10,24 @@ class Zombie extends Actor {
     this.currentIndexOnPath = 0;
 
     this.accel = 800;
-    this.maxVel = 100;
+    this.maxVel = 120;
     this.texture = new Texture("res/player.png");
 
-    this.periodicTimer = new PeriodicTimer(0.6, true, true);
+    this.periodicTimer = new PeriodicTimer(0.3, true, true);
+    this.periodicTimer.trigger();
 
     this.timeSinceLastAttack = 0;
     this.timeBetweenAttack = 0.5;
 
     this.lastHitVel = new Vec2(0, 0);
+
+    this.previousRotation = 0;
     
   }
 
   update (){
+
+    this.timeSinceLastAttack += deltaTime;
 
     if (this.health < 0 && !this.remove) {
       this.remove = true;
@@ -30,9 +36,6 @@ class Zombie extends Actor {
 
       for (let i = 0; i < 5; i++) {
 
-        //let offsetAngle = this.rotation * Math.PI / 180;//
-        //let offsetAngle = this.rotation;
-        //let particleVec = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
         let particleVec = this.lastHitVel;
 
         let dir = particleVec;
@@ -55,24 +58,45 @@ class Zombie extends Actor {
 
       }
 
-      guns.push(new Rifle(this.pos.copy()));
-
       let rand = Math.random() * 100;
+      //only 20% chance of spawning random weapon
       if (rand > 20) {
-        let rand = Math.random() * 100;
-        let randInt = Math.floor(Math.random()*4);
+        let gunSelection = gameManager.spawnableGuns[gameManager.round];
+        let randInt = Math.floor(Math.random()*gunSelection.length);
+        let gun = gunSelection[randInt];
+        guns.push(new gun(this.pos.copy()));
 
       }
     }
 
     if (this.timeSinceLastAttack > this.timeBetweenAttack) {
-      //vec forward =
-      //let attack box = 
-      // get all players in attach box
-      // attack the first one
+      if (player.isIntersecting(this) && player.health > 0) {
+        this.timeSinceLastAttack = 0.0;
+        player.health -= 9;
+        player.timeSinceDamaged = 0.0;
+
+
+        let spread = 45;
+        let particleVec = player.pos.sub(this.pos);
+        let dir = particleVec.normalized();
+        
+
+        for (let j = 0; j < 4; j++) {
+          let ang = -Math.atan2(dir.y, dir.x); // In radians
+
+          ang += 90 * (Math.PI / 180);
+          ang += (Math.random() * spread - (spread * 0.5) ) * (Math.PI / 180);
+          dir = new Vec2(Math.sin(ang), Math.cos(ang));
+
+          particleManager.createParticle(player.getCenter(), dir.mul(200+Math.random()*500), ParticleManager.types.BLOOD, 20+Math.random()*10);
+        }
+        
+      }
     }
 
-    if (this.periodicTimer.trigger()) {
+    if (this.periodicTimer.willTrigger()) {
+
+      this.previousRotation = this.rotation;
 
       var mouseWorldGrid = new Vec2(Math.floor(player.getCenter().x / 32), Math.floor(player.getCenter().y / 32));
       mouseWorldGrid.x = Math.max(0, Math.min(level.width, mouseWorldGrid.x));
@@ -92,7 +116,7 @@ class Zombie extends Actor {
     //console.log("p: " + this.currentIndexOnPath);
     
 
-    if (this.path.length > 0 && this.currentIndexOnPath < this.path.length) {
+    if (this.path.length > 2 && this.currentIndexOnPath < this.path.length) {
       this.targetPos = new Vec2(this.path[this.currentIndexOnPath].x * level.tileSize + 16, this.path[this.currentIndexOnPath].y * level.tileSize +16);
     }
     //this.targetPos = new Vec2(30+16, 30+16);
@@ -107,22 +131,25 @@ class Zombie extends Actor {
 
 
     deltaPos = deltaPos.normalized().mul(deltaTime * this.accel);
-    this.vel = this.vel.add(deltaPos);
+
+    //if (deltaPos.mag() < 3000) {
+      this.vel = this.vel.add(deltaPos);
+    //}
+    
 
     if (this.vel.mag() > this.maxVel) {
       this.vel = this.vel.normalized().mul(this.maxVel);
     }
 
-    if (deltaPos.mag() == 0) {
-      this.vel = this.vel.mul(25 * deltaTime);
-    }
+    //
 
-    this.rotation = Math.atan(deltaPos.y / deltaPos.x) * 180 / Math.PI;
-    if (deltaPos.x >= 0.0) {
-      this.rotation += 180;
-    }
+    this.rotation = Math.atan2(deltaPos.y, deltaPos.x) * 180 / Math.PI;
+    //if (deltaPos.x >= 0.0) {
+    //  
+    //}
+    this.rotation += 180;
 
-    this.rotation += 90;
+    //this.rotation = lerp(this.previousRotation, this.rotation, this.periodicTimer.currentTime / this.periodicTimer.interval);
 
     super.update();
   }

@@ -14,32 +14,22 @@ class Player extends Actor {
     //this.altWeapon = new PulseWave(new Vec2(0,0));
     //this.activeWeapon = new Sniper(new Vec2(0,0));
 
-    this.altWeapon = new Rifle(new Vec2(0, 0));
+    this.altWeapon = new Pistol(new Vec2(0, 0));
     //this.activeWeapon = new Sniper(new Vec2(0, 0));
-    this.activeWeapon = new SuperRifle(new Vec2(0, 0));
-
-    this.lastPos = this.pos.copy();
-
-    this.distanceMoved = 0;
+    this.activeWeapon = new Pistol(new Vec2(0, 0));
+    this.activeWeapon = new Uzi(new Vec2(0, 0));
 
     this.swayAngle = 0;
-    
+    this.timeSinceDamaged = 0;
   }
 
   update (){
 
-    let dPos = this.pos.sub(this.lastPos);
+    this.timeSinceDamaged += deltaTime;
 
-    this.distanceMoved += dPos.mag();
-
-    
-    this.lastPos = this.pos.copy();
-
-    let freq = 0.1;
-    let amp = 0.1;
-    this.swayAngle = Math.sin(this.distanceMoved * freq) * 180 / Math.PI * amp;
-
-    //console.log(this.swayAngle);
+    if (player.timeSinceDamaged > 5 & this.health < 100) {
+      this.health += 4 * deltaTime;
+    }
 
     var vec3 = cameraPosition.add(this.getCenter()); // position of player screen space
 		var relvec3 = new Vec2(mouseX, mouseY).sub(vec3);
@@ -48,10 +38,6 @@ class Player extends Actor {
 		if (relvec3.x >= 0.0) {
 			this.rotation += 180;
 		}
-
-    this.rotation += 90;
-    
-    this.rotation += this.swayAngle;
 
     this.lifeTime += deltaTime;
 
@@ -71,15 +57,13 @@ class Player extends Actor {
     }
 
     let lookDotInput = inputVec3.normalized().dot(relvec3.normalized());
-    //console.log();
 
     // Move slower when going backwards
     let inputFactor = Math.min(Math.max(0,lookDotInput+1.5), 1);
     //console.log(inputFactor);
     var deltaPos = inputVec3;//.mul(inputFactor);
 
-    
-
+  
     deltaPos = deltaPos.normalized().mul(deltaTime * this.accel);
 
     // apply velocity from controls
@@ -100,11 +84,10 @@ class Player extends Actor {
       this.vel = this.vel.normalized().mul(this.maxVel * inputFactor);
     }
 
-    //TODO: update this code
+    //TODO: update this code e.g put guns into quadtree
     if (downKeysFrame.has(69)) {
-      //console.log("sdg")
       for (var i = 0; i < guns.length; i++) {
-        if (guns[i].hit(this.getCenter())) {
+        if (guns[i].isIntersecting(this)) {
 
           if (this.altWeapon == null) {
             this.altWeapon = this.activeWeapon;
@@ -112,6 +95,7 @@ class Player extends Actor {
           } else {
             this.activeWeapon = guns[i];
           }
+          this.tileIndex = this.activeWeapon.playerTileIndex;
           
           guns.splice(i, 1);
           i--;
@@ -123,11 +107,11 @@ class Player extends Actor {
     }
 
     // Firing bullets stuff
-
     this.timeSinceLastFire += deltaTime;
-
+    // We ran out of ammo. spawn a pistol
     if (this.activeWeapon.ammo <= 0) {
       this.activeWeapon = new Pistol(new Vec2(0,0));
+      this.tileIndex = this.activeWeapon.playerTileIndex;
     }
 
     var bulletVec2 = new Vec2(mouseX, mouseY).sub(cameraPosition.add(this.getCenter()));
@@ -136,28 +120,26 @@ class Player extends Actor {
     var spread = this.activeWeapon.spread;
     bulletAngle += 90 * (Math.PI / 180); // offset 90 degrees 
 
-    //console.log(bulletAngle + ": " + bulletVec3.x + " " + bulletVec3.y + " ")
-    //console.log();
 
     if (this.timeSinceLastFire > this.activeWeapon.timeBetweenShots && mouseDown && this.activeWeapon.ammo > 0) {
 
       this.timeSinceLastFire = 0;
       //playSound();
+      this.vel = this.vel.sub(bulletVec2.normalized().mul(this.activeWeapon.recoil));
+
       for (var i = 0; i < this.activeWeapon.bulletsEachShot; i++) {
 
         var offsetAngle = bulletAngle + (Math.random() * spread - (spread * 0.5) ) * (Math.PI / 180);
         bulletVec2 = new Vec2(Math.sin(offsetAngle), Math.cos(offsetAngle));
 
-
         var bullet = new Bullet(this.getCenter(), this.activeWeapon.damage);
         bullet.vel = bulletVec2.normalized().mul(this.activeWeapon.bulletSpeed);
+        bullet.isPenatrating = this.activeWeapon.isPenatrating;
         bulletList.push(bullet);
         
       }
       this.activeWeapon.ammo = this.activeWeapon.ammo - 1;
     }
-
-    //if (onKeyDownCodeSet.has(69)) {
     
     super.update();
   }
@@ -168,5 +150,6 @@ class Player extends Actor {
     var temp = this.activeWeapon;
     this.activeWeapon = this.altWeapon;
     this.altWeapon = temp;
+    this.tileIndex = this.activeWeapon.playerTileIndex;
   }
 }

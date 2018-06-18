@@ -9,12 +9,26 @@ class Entity {
     this.lifeTime = 0;
     this.health = 100;
     this.rotation = 0;
+    this.swayAngle = 0;
+
+    this.tileIndex = 0;
 
     this.mass = 10;
     this.remove = false;
+
+    this.lastPos = this.pos.copy();
+    this.distanceMoved = 0;
   }
 
   update (){
+
+    let dPos = this.pos.sub(this.lastPos);
+    this.distanceMoved += dPos.mag();
+    this.lastPos = this.pos.copy();
+
+    let freq = 0.1;
+    let amp = 0.1;
+    this.swayAngle = Math.sin(this.distanceMoved * freq) * 180 / Math.PI * amp;
 
     ///*
 		var nextXposition = this.pos.x + this.vel.x * deltaTime;
@@ -128,14 +142,49 @@ class Entity {
     ctx.save();
     ctx.translate(vec.x,vec.y); //  +this.height*0.5
     ctx.strokeStyle = "rgb(255,0,0)";
-    //ctx.strokeRect(0, 0,this.width,this.height);
+
+
+    
+
+    /*
+    let forward = new Vec2(Math.cos(this.rotation * Math.PI / 180), Math.sin(this.rotation * Math.PI / 180)).mul(-20);
+    
+
+    //let attackBox = {pos: this.getCenter().add(forward).add(-32,-32), width: 64, height: 64};
+    let attackBox = this;//{pos: this.getCenter().add(forward).add(-32,-32), width: 64, height: 64};
+
+    if (player.isIntersecting(attackBox)) {
+      ctx.strokeStyle = "rgb(0,0,255)";
+    } else {
+      ctx.strokeStyle = "rgb(255,0,0)";
+    }
+
+    ctx.strokeRect(forward.x, forward.y,this.width,this.height);
+
+    ctx.beginPath();
+        ctx.moveTo(Entity.tileSize*0.5, Entity.tileSize*0.5);
+        ctx.lineTo(Entity.tileSize*0.5+forward.x, Entity.tileSize*0.5+forward.y);
+        ctx.stroke();
+        */
 
     ctx.translate(+this.width*0.5, +this.width*0.5);
-    ctx.rotate(this.rotation * Math.PI/180);
+    ctx.rotate((this.rotation+this.swayAngle) * Math.PI/180);
 
-    ctx.drawImage(this.texture.image,-32,-32);
+    //ctx.drawImage(this.texture.image,-32,-32);
+
+    let type = this.tileIndex;
+    let tileX = type % Gun.tilesPerRow;
+    let tileY = (type / Gun.tilesPerRow) >> 0;
+    ctx.drawImage(Entity.texture.image, tileX * Entity.tileSize, tileY * Entity.tileSize, Entity.tileSize, Entity.tileSize, -Entity.tileSize*0.5 , -Entity.tileSize*0.5, Entity.tileSize, Entity.tileSize);
+    
     ctx.restore();
+
+    //ctx.strokeRect(this.pos.x, this.pos.y, this.width ,this.height );
 
   }
 
 }
+
+Entity.tileSize = 64;
+Entity.tilesPerRow = 4;
+Entity.texture = new Texture("res/entities.png");

@@ -13,11 +13,6 @@ class Level{
     this.endX = 20;
     this.endY = 10;
 
-    //console.log(this.chunkMap[5]);
-
-    //this.chunk = new Chunk(0,0,this);
-    //this.chunkMap[0] = this.chunk;
-
     console.log(width);
     this.pos = new Vec2(0, 0);
     this.cells = new Array();
@@ -31,17 +26,11 @@ class Level{
     this.roads = Array(this.width*this.width);
     this.interior = Array(this.width*this.width);
 
-
     this.parseLayer(this.ground, 0, xmlDoc);
     this.parseLayer(this.roads, 1, xmlDoc);
     this.parseLayer(this.interior, 2, xmlDoc);
 
     this.drawsFrame = 0;
-
-
-    //console.log(this.interior);
-
-
   }
 
 
@@ -134,7 +123,6 @@ class Level{
           if (tile == -1) {
             continue;
           }
-          //console.log(tile);
 
           var tileX =  tile % this.tileSheetTilesPerInRow;
           var tileY = Math.floor(tile/this.tileSheetTilesPerInRow);
@@ -196,13 +184,6 @@ class Level{
     }
   }
 
-  hitPlayer (v){
-    
-    //if(this.pos.x+this.width / 2 < v.x || this.pos.x-this.width  / 2 > v.x ) return false;
-    //if(this.pos.y+this.height / 2 < v.y || this.pos.y-this.height  / 2 > v.y ) return false;
-    return false;
-    //return true;
-  }
 
   hit (v){
     //var x = Math.floor((v.x) / this.tileSize );

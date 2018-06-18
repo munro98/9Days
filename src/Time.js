@@ -11,7 +11,11 @@ class PeriodicTimer {
 
   }
 
-  trigger () {
+  trigger() {
+    this.currentTime = this.interval;
+  }
+
+  willTrigger () {
     this.currentTime += deltaTime;
     if (this.currentTime > this.interval) {
       this.currentTime = 0;

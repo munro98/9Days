@@ -4,6 +4,8 @@ class Bullet {
     this.damage = damage;
     this.vel = new Vec2(0, 0);
 
+    this.isPenatrating = false;
+
     this.width = 16;
     this.height = 16;
     this.lifeTime = 0;
@@ -28,7 +30,9 @@ class Bullet {
     }
 
     if (this.testHitLevel()) {
-      this.remove = true;
+      if (!this.isPenatrating) {
+        this.remove = true;
+      }
 
       let spread = 90;
 
@@ -49,6 +53,8 @@ class Bullet {
         //console.log(dir.x);
 
         particleManager.createParticle(this.pos, dir.mul(500+Math.random()*500), ParticleManager.types.DEBRI, 20+Math.random()*10);
+
+        particleManager.createParticle(this.pos, dir.mul(500+Math.random()*200), ParticleManager.types.SPARK, 2);
 
       }
     }
@@ -82,9 +88,6 @@ class Bullet {
       return;
     if (vec3.x > cameraBound.x || vec3.y > cameraBound.y)
       return;
-
-    
-
 
     ctx.save();
     ctx.translate(vec3.x,vec3.y);

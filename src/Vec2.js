@@ -73,6 +73,10 @@ class Vec2 {
 	}
 }
 
+function lerp(a, b, f) {
+	return a + f * (b - a);
+}
+
 // if running inside node
 if (typeof exports !== "undefined")
 	exports.Vec2 = Vec2;

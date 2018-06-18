@@ -37,7 +37,6 @@ for (var i = 0; i < 3; i++) {
 }
 
 
-
 //zombieList.push(new Zombie(new Vec2(200, 200)));
 //zombieList.push(new Zombie(new Vec2(400, 400)));
 
@@ -45,8 +44,6 @@ var bulletList = new Array();
 
 var guns = new Array();
 guns.push(new Rifle(new Vec2(500, 100)));
-
-
 
 var onKeyDownCodeSet = new Set();
 var keyCodeSet = new Set();
@@ -61,54 +58,26 @@ function playSound() {
 }
 
 /*
-
 battle royal game mode
 pulse wave gun
-using sniper gives extended view range
-add dash mechanic
 fix sniper spread
 scoreboard
 respawning
 playerid/team in bullet class
-bullet spread from weapon properties
 team dethmatch
 bullet sponge gamemode (players gradually get more powerful guns)
-don't draw offscreen entities(use quadtree) / bullets
-
-make more art
-animate legs
-
-
-design abilities
-
-Refactor
-
-fix onkeydown
-and concurrency in swapWeapons
 
 zombies looking direction
 improve spawn system
-zombies do damage to player
-update picking up guns
-
-
-
 */
 var c;
 var ctx;
 
-var background;
-var bullet;
 var deltaTime = 0.0;
 var previousTime = 0.0;
-
 var date;
-
 var cameraPosition;
-
 var gameManager;
-
-var width = 20;
 
 let lastFrameIndex = 0;
 let frames = new Array(4);
@@ -302,7 +271,13 @@ function tick(currentTimeMilli) {
 
   //Update game objects
   
-  player.update();
+  if (player.health > 0)
+    player.update();
+  else {
+    player.rotation = 0;
+    player.swayAngle = 0;
+    player.tileIndex = 5;
+  }
 
   for (var i = 0; i < zombieList.length; i++) {
     zombieList[i].update();
@@ -311,6 +286,10 @@ function tick(currentTimeMilli) {
   ///*
   for (var i = 0; i < bulletList.length; i++) {
     bulletList[i].update();
+  }
+
+  for (var i = 0; i < guns.length; i++) {
+    guns[i].update();
   }
   //*/
 
@@ -334,7 +313,7 @@ function tick(currentTimeMilli) {
     }
   }
   //*/
-  
+
   //Bullets hitting zombies
   for (var j = 0; j < bulletList.length; j++) {
     if (bulletList[j].remove == true)
@@ -354,7 +333,9 @@ function tick(currentTimeMilli) {
         if (potentialCollisions[i].isPointIntersecting2(    bulletList[j].pos.add(bulletList[j].vel.mul(deltaTime*fraction))     )) {
           potentialCollisions[i].health -= bulletList[j].damage;
           potentialCollisions[i].lastHitVel = bulletList[j].vel;
+
           bulletList[j].remove = true;
+          
           break label1;
         }
         
@@ -371,15 +352,22 @@ function tick(currentTimeMilli) {
   //Remove entites
 
   //Remove dead bullets
-  for (var i = 0; i < bulletList.length; i++) {
+  for (let i = 0; i < bulletList.length; i++) {
     if (bulletList[i].remove) {
       bulletList.splice(i, 1);
       i--;
     }
   }
 
+  for (let i = 0; i < guns.length; i++) {
+    if (guns[i].remove) {
+      guns.splice(i, 1);
+      i--;
+    }
+  }
+
   //Remove dead zombies
-  for (var i = 0; i < zombieList.length; i++) {
+  for (let i = 0; i < zombieList.length; i++) {
     if (zombieList[i].remove) {
       zombieList.splice(i, 1);
       i--;
@@ -393,9 +381,7 @@ function tick(currentTimeMilli) {
   level.draw(cameraPosition, ctx.canvas.width, ctx.canvas.height);
   //level.aStarDraw(cameraPosition);
 
-  for (var i = 0; i < guns.length; i++) {
-    guns[i].draw(cameraPosition);
-  }
+  
 
   var cameraPosAndBox = {
     pos: cameraPosition.mul(-1),
@@ -403,11 +389,15 @@ function tick(currentTimeMilli) {
     height: cameraBox.y,
   }
 
-  particleManager.render(cameraPosition);
+  particleManager.render(cameraPosition, cameraBox);
 
-  var potentialCollisions = quadTree.selectBoxes(cameraPosAndBox);
-  for (var i = 0; i < potentialCollisions.length; i++) {
-    potentialCollisions[i].draw(cameraPosition);
+  for (var i = 0; i < guns.length; i++) {
+    guns[i].draw(cameraPosition);
+  }
+
+  var potentiallyOnScreen = quadTree.selectBoxes(cameraPosAndBox);
+  for (var i = 0; i < potentiallyOnScreen.length; i++) {
+    potentiallyOnScreen[i].draw(cameraPosition);
   }
 
   //for (var i = 0; i < zombieList.length; i++) {
@@ -432,7 +422,8 @@ function tick(currentTimeMilli) {
   ctx.font = "30px Verdana";
   //ctx.font = "30px Impact";
   ctx.textAlign="center";
-  ctx.fillText(gameManager.statesText[gameManager.state] + " Day: " + gameManager.round + "\n "+ zombieList.length + " " + bulletList.length,ctx.canvas.width / 2,50);
+  //ctx.fillText(gameManager.statesText[gameManager.state] + " Day: " + gameManager.round + "\n "+ zombieList.length + " " + bulletList.length,ctx.canvas.width / 2,50);
+  ctx.fillText(gameManager.stateString(), ctx.canvas.width / 2, 50);
 
   //ctx.textAlign="left";
   //ctx.fillText("Abilities",20, ctx.canvas.height - 20);
@@ -440,7 +431,7 @@ function tick(currentTimeMilli) {
   ctx.fillText("FPS: " + Math.round(fps), 20, 50);
 
   ctx.textAlign="right";
-  ctx.fillText("HP: " + player.health + " Ammo: " + player.activeWeapon.ammo,ctx.canvas.width - 20, ctx.canvas.height - 20);
+  ctx.fillText("HP: " + Math.round(player.health) + " Ammo: " + player.activeWeapon.ammo,ctx.canvas.width - 20, ctx.canvas.height - 20);
 
 
   lastDownKeys = currentDownKeys;
