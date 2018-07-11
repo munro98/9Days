@@ -7,7 +7,12 @@ Controls
 Move - WASD
 Fire - Mouse
 Pickup Gun - E
-Sawp gun - SrollWheel
+Sawp gun - SrcollWheel
+
+Tech
+JS, HTML5
+
+Grahpics made with Krita
 
 Features
 - Tiled map Rendering (Created with the tiled map editor)
@@ -15,7 +20,7 @@ Features
 - Simple AABB physics with players against zombies
 - Quadtree Acceleration for Collision
 - Quadtree Acceleration for Rendering
-- Persistant Particles
+- Persistent Particles
 - A* Pathfinding on zombies
 - Projectile bullets(With multi-sampled collision detection against the level)
 - Multiple Weapons
