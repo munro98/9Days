@@ -9,6 +9,8 @@ Fire - Mouse
 Pickup Gun - E
 Sawp gun - SrcollWheel
 
+![landscape scene](https://raw.githubusercontent.com/munro98/9days/master/screenshot.jpg)
+
 Tech
 JS, HTML5
 
@@ -28,5 +30,5 @@ Features
 
 
 Possible future features
-Touch screen support
-Sound
+- Touch screen support
+- Sound
