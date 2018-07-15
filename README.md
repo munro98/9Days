@@ -4,10 +4,10 @@ A Top Down Zombie Shooter
 Play Now! [Play](https://munro98.github.io/9Days/)
 
 Controls
-Move - WASD
-Fire - Mouse
-Pickup Gun - E
-Sawp gun - SrcollWheel
+- Move - WASD
+- Fire - Mouse
+- Pickup Gun - E
+- Swap gun - SrcollWheel
 
 ![landscape scene](https://raw.githubusercontent.com/munro98/9days/master/screenshot.jpg)
 
